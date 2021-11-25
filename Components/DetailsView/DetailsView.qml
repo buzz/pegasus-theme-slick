@@ -1,11 +1,19 @@
 import QtQuick 2.8
+import QtGraphicalEffects 1.12
+import "GameGrid"
+import "GameDetails"
 
 FocusScope {
-  id: detailsView
+  id: root
 
   property var currentCollection
-//   property alias currentGameIndex: grid.currentIndex
-//   readonly property var currentGame: currentCollection.games.get(currentGameIndex)
+  property alias currentGameIndex: grid.currentGameIndex
+  readonly property var currentGame: currentCollection.games.get(currentGameIndex)
+
+  width: parent.width
+  height: parent.height
+  enabled: focus
+  visible: y + height >= 0
 
   signal cancel
   signal nextCollection
@@ -37,19 +45,45 @@ FocusScope {
       return;
     }
   }
+
+  Rectangle {
+    color: "#0c0c0c"
+    anchors.fill: parent
+  }
+
+  GameGrid {
+    id: grid
+    width: parent.width / 2
+    anchors {
+      top: parent.top
+      right: parent.right
+      bottom: parent.bottom
+    }
+  }
+
+  // Subtle gradient over the bottom of the grid
+  LinearGradient {
+    anchors {
+      fill: parent
+      topMargin: vpx(360)
+    }
+    start: Qt.point(0, 0)
+    end: Qt.point(0, height)
+    gradient: Gradient {
+      GradientStop { position: 0.0; color: "#000c0c0c" }
+      GradientStop { position: 0.7; color: "#dd0c0c0c" }
+      GradientStop { position: 1.0; color: "#ff0c0c0c" }
+    }
+    cached: true
+  }
+
+  GameDetails {
+    width: parent.width / 2
+
+    anchors {
+      top: parent.top
+      left: parent.left
+      bottom: parent.bottom
+    }
+  }
 }
-
-// Image {
-//   id: imageCollectionName
-//   source: "../../assets/logos/%1.svg".arg(currentCollection.shortName)
-//   fillMode: Image.PreserveAspectFit
-//   width: vpx(200)
-//   height: vpx(50)
-
-//   anchors {
-//     left: parent.left
-//     leftMargin: vpx(marginLeft)
-//     bottom: parent.bottom
-//     bottomMargin: vpx(marginTop)
-//   }
-// }

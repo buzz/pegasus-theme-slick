@@ -6,10 +6,7 @@ Item {
 
   property var currentCollection
 
-  anchors.top: parent.top
-  anchors.left: parent.left
-  anchors.right: parent.right
-  anchors.bottom: parent.bottom
+  anchors.fill: parent
 
   Text {
     id: textSystemYear
@@ -135,7 +132,7 @@ Item {
     font.family: subheaderFont.name
     font.pixelSize: vpx(fontSizeDescription)
     minimumPixelSize: vpx(fontSizeDescriptionMin)
-    width: vpx(340)
+    width: vpx(420)
     wrapMode: Text.Wrap
 
     anchors {

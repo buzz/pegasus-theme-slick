@@ -53,7 +53,7 @@ FocusScope {
     currentCollection: root.currentCollection
   }
 
-  Collection {
+  CollectionDetails {
     currentCollection: root.currentCollection
   }
 }
