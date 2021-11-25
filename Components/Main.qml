@@ -33,7 +33,6 @@ FocusScope {
       api.memory.set('collectionIndex', collectionsView.currentCollectionIndex);
       api.memory.set(currentCollection.shortName + 'GameIndex', currentGameIndex);
       collectionsView.focus = true;
-      console.log("CANCEL");
     }
     onNextCollection: {
       api.memory.set('collectionIndex', collectionsView.currentCollectionIndex);

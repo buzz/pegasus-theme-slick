@@ -14,6 +14,7 @@ FocusScope {
   height: parent.height
   enabled: focus
   visible: y + height >= 0
+  clip: true
 
   signal cancel
   signal nextCollection
@@ -46,43 +47,30 @@ FocusScope {
     }
   }
 
+  // Background
   Rectangle {
     color: "#0c0c0c"
     anchors.fill: parent
   }
 
-  GameGrid {
-    id: grid
-    width: parent.width / 2
-    anchors {
-      top: parent.top
-      right: parent.right
-      bottom: parent.bottom
-    }
-  }
-
-  // Subtle gradient over the bottom of the grid
-  LinearGradient {
-    anchors {
-      fill: parent
-      topMargin: vpx(360)
-    }
-    start: Qt.point(0, 0)
-    end: Qt.point(0, height)
-    gradient: Gradient {
-      GradientStop { position: 0.0; color: "#000c0c0c" }
-      GradientStop { position: 0.7; color: "#dd0c0c0c" }
-      GradientStop { position: 1.0; color: "#ff0c0c0c" }
-    }
-    cached: true
-  }
-
   GameDetails {
-    width: parent.width / 2
+    id: gameDetails
+    width: parent.width / 2.2
 
     anchors {
       top: parent.top
       left: parent.left
+      bottom: parent.bottom
+    }
+  }
+
+  GameGrid {
+    id: grid
+    width: parent.width / 2
+
+    anchors {
+      top: parent.top
+      right: parent.right
       bottom: parent.bottom
     }
   }

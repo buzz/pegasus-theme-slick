@@ -1,127 +1,211 @@
-// Pegasus Frontend
-// Copyright (C) 2017-2018  Mátyás Mustoha
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-
 import QtQuick 2.8
 import QtGraphicalEffects 1.12
 
-Rectangle {
-  id: root
-
-  property bool selected: false
-  property var game
-  property var systemColor
-
-  antialiasing: true
-
-  border.color: selected ? systemColor : "transparent"//"#99FFFFFF"
-  border.width: vpx (6) // selected ? vpx(3) : 0
-  color: selected ? "#000000" : "transparent"
-
-  property alias imageWidth: boxFront.paintedWidth
-  property alias imageHeight: boxFront.paintedHeight
-  property real imageHeightRatio: 0.5
-
+Item {
+  id: gridItem
   height: width * imageHeightRatio
+  z: 1
+
+  property var game
+  property int columnCount
+
+  property alias imageWidth: imageBoxArt.paintedWidth
+  property alias imageHeight: imageBoxArt.paintedHeight
+  property bool imageLoading: imageBoxArt.status === Image.Loading
+  property real imageHeightRatio: 0.5
 
   signal clicked()
   signal doubleClicked()
   signal imageLoaded(int imgWidth, int imgHeight)
 
-  scale: selected ? 1.5 : 1
-  opacity: 1 //selected ? 1 : 0.666
-  z: selected ? 3 : 1
+  readonly property int tilePadding: 4
 
-  Behavior on scale { PropertyAnimation { duration: 150 } }
-  // Behavior on opacity { PropertyAnimation { duration: 333 } }
+  readonly property bool firstColumn: index % columnCount === 0
+  readonly property bool lastColumn: index % columnCount === columnCount - 1
 
-  layer.enabled: selected ? true : false
-  layer.effect: DropShadow {
-    fast: true
-    spread: 0.1
-    horizontalOffset: 0
-    verticalOffset: 0
-    radius: vpx(12)
-    samples: 20
-    color:  "#000000"
-    transparentBorder: true
+  // Keep outmost left/right items within grid bounds
+  property real translateX: {
+    if (index % columnCount === 0) {
+      return (width - tilePadding) / 2 - 24; // First column
+    }
+    if (index % columnCount === columnCount - 1) {
+      return - (width - tilePadding) / 2 + 24; // Last column
+    }
+    return 0;
   }
 
-  Image {
-    id: boxFront
-    anchors { fill: parent; margins: vpx(4) }
+  transform: Translate {
+    id: translation
+    x: 0
+  }
 
-    asynchronous: true
-    visible: game.assets.boxFront
+  states: [
+    State {
+      name: "selected"
+      PropertyChanges {
+        target: gridItem
+        z: 3
+      }
+      PropertyChanges {
+        target: translation
+        x: vpx(gridItem.translateX)
+      }
+      PropertyChanges {
+        target: boxArt
+        scale: 1
+        layer.enabled: true
+      }
+    }
+  ]
 
-    source: game.assets.boxFront || ""
-    sourceSize { width: 256; height: 256 }
-    fillMode: Image.PreserveAspectFit
-    smooth: true
-
-    onStatusChanged: if (status === Image.Ready) {
-      imageHeightRatio = paintedHeight / paintedWidth;
-      root.imageLoaded(paintedWidth, paintedHeight);
+  transitions: Transition {
+    PropertyAnimation {
+      target: gridItem
+      property: "z"
+      duration: durationFast
+    }
+    PropertyAnimation {
+      target: translation
+      property: "x"
+      duration: durationFast
+      easing.type: Easing.InOutCubic
+    }
+    PropertyAnimation {
+      target: boxArt
+      property: "scale"
+      duration: durationFast
+      easing.type: Easing.InOutCubic
     }
   }
 
-  Image {
-    anchors.centerIn: parent
-
-    visible: boxFront.status === Image.Loading
-    source: "../../../assets/loading-spinner.png"
-
-    RotationAnimator on rotation {
-      loops: Animator.Infinite;
-      from: 0;
-      to: 360;
-      duration: 2000
-    }
-  }
-
+  // Box art image (non-selected are scaled down, so zoomed-in picture are crisp)
   Rectangle {
-    id: textBox
-    width: boxFront.width
-    height: boxFront.height
-    anchors.centerIn: parent
-    // anchors.margins: vpx(4)
-    visible: !game.assets.boxFront
-    color: "#000000"
-  }
+    id: boxArt
+    width: parent.width * boxArtScaleFactor
+    height: parent.height * boxArtScaleFactor
+    transform: Translate {
+      x: - width
+      y: - height
+    }
 
-  Text {
-    width: parent.width - vpx(10)
-    height: parent.height - vpx(10)
-    anchors.centerIn: parent
+    color: "transparent"
 
-    visible: !game.assets.boxFront
+    scale: 1 / boxArtScaleFactor
 
-    text: game.title
-    wrapMode: Text.Wrap
-    horizontalAlignment: Text.AlignHCenter
-    color: "#eee"
-    font {
-      pixelSize: vpx(16)
-      family: globalFonts.condensed
+    layer.enabled: false
+    layer.effect: DropShadow {
+      spread: 0.15
+      horizontalOffset: 0
+      verticalOffset: 0
+      radius: vpx(18)
+      samples: 37
+      color:  "black"
+      transparentBorder: true
+    }
+
+    Image {
+      id: imageBoxArt
+      anchors {
+        fill: parent
+        margins: vpx(tilePadding)
+      }
+
+      asynchronous: true
+      visible: game.assets.boxFront
+
+      source: game.assets.boxFront || ""
+      sourceSize { width: 512; height: 512 }
+      fillMode: Image.PreserveAspectFit
+      smooth: true
+
+      onStatusChanged: {
+        if (status === Image.Ready) {
+          imageHeightRatio = paintedHeight / paintedWidth;
+          gridItem.imageLoaded(paintedWidth, paintedHeight);
+        }
+      }
+    }
+
+    // Missing box art fallback: Show dummy box art with game title
+    Rectangle {
+      anchors {
+        fill: parent
+        margins: vpx(tilePadding)
+      }
+      border {
+        width: vpx(8)
+        color: "#333"
+      }
+      color: "#888"
+      visible: !game.assets.boxFront
+
+      Item {
+        anchors.fill: parent
+
+        Text {
+          anchors.fill: parent
+          text: "?"
+          font {
+            pixelSize: vpx(9999)
+            family: subheaderFont.name
+          }
+          color: "#777"
+          fontSizeMode: Text.Fit
+          horizontalAlignment: Text.AlignHCenter
+          verticalAlignment: Text.AlignVCenter
+        }
+
+        Text {
+          anchors {
+            fill: parent
+            margins: vpx(16)
+          }
+          text: game.title
+          wrapMode: Text.WrapAnywhere
+          horizontalAlignment: Text.AlignHCenter
+          verticalAlignment: Text.AlignVCenter
+          color: "#222"
+          font {
+            pixelSize: vpx(48)
+            family: headerFont.name
+          }
+        }
+      }
+    }
+
+    // Loading spinner
+    Item {
+      visible: imageLoading
+      anchors {
+        fill: parent
+        margins: vpx(tilePadding)
+      }
+
+      Rectangle {
+        width: imageBoxArt.width
+        height: imageBoxArt.height
+        color: "black"
+        anchors.fill: parent
+      }
+
+      Image {
+        anchors.centerIn: parent
+
+        source: "../../../assets/loading-spinner.png"
+
+        RotationAnimator on rotation {
+          loops: Animator.Infinite;
+          from: 0;
+          to: 360;
+          duration: 1333
+        }
+      }
     }
   }
 
   MouseArea {
     anchors.fill: parent
-    onClicked: root.clicked()
-    onDoubleClicked: root.doubleClicked()
+    onClicked: gridItem.clicked()
+    onDoubleClicked: gridItem.doubleClicked()
   }
 }

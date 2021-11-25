@@ -29,30 +29,14 @@ Item {
     }
 
     // Game title
-    // Rectangle {
-    //   width: parent.width
-    //   color: "blue"
-    //   Layout.fillHeight: true
-    //   // clip: true
-
-    //   Text {
-    //     text: "Foobar"
-    //     font.pixelSize: vpx(20)
-    //   }
-    // }
-
     Text {
       color: "white"
       text: currentGame.title
       font.pixelSize: vpx(56)
       font.family: headerFont.name
-      // fontSizeMode: Text.Fit
-      // maximumLineCount: 2
       Layout.alignment: Qt.AlignVTop | Qt.AlignLeft
       Layout.fillWidth: true
-      // Layout.fillHeight: true
       Layout.preferredWidth: parent.width
-      // width: parent.width
       elide: Text.ElideRight
     }
 

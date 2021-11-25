@@ -42,7 +42,7 @@ Rectangle {
       Text {
         id: metaValue
         text: metaContent
-        color: "black"
+        color: "#222"
         width: parent.width
         height: parent.height
         font.family: headerFont.name
@@ -60,8 +60,6 @@ Rectangle {
         wrapMode: Text.WordWrap
         maximumLineCount: 3
         lineHeight: 0.8
-
-        Behavior on text { FadeAnimation { target: metaValue }}
       }
     }
   }
