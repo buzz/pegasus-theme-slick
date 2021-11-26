@@ -11,7 +11,7 @@ Item {
   Text {
     id: textSystemYear
     text: currentCollection.extra.year || ""
-    color: "#888888"
+    color: colorFont
     font.family: subheaderFont.name
     font.pixelSize: vpx(fontSizeSubheader)
     minimumPixelSize: vpx(fontSizeSubheaderMin)
@@ -27,7 +27,7 @@ Item {
   Text {
     id: textDot1
     text: currentCollection.extra.year ? " · " : ""
-    color: "#616161"
+    color: colorFontLightlyTinted
     font.family: subheaderFont.name
     font.pixelSize: vpx(fontSizeSubheader)
     minimumPixelSize: vpx(fontSizeSubheaderMin)
@@ -42,7 +42,7 @@ Item {
   Text {
     id: textSystemCompany
     text: currentCollection.extra['company'] || ""
-    color: "#888888"
+    color: colorFont
     font.family: subheaderFont.name
     font.pixelSize: vpx(fontSizeSubheader)
     minimumPixelSize: vpx(fontSizeSubheaderMin)
@@ -58,7 +58,7 @@ Item {
   Text {
     id: textDot2
     text: currentCollection.extra['company'] ? " · " : ""
-    color: "#616161"
+    color: colorFontLightlyTinted
     font.family: subheaderFont.name
     font.pixelSize: vpx(fontSizeSubheader)
     minimumPixelSize: vpx(fontSizeSubheaderMin)
@@ -73,7 +73,7 @@ Item {
   Text {
     id: textSystemShortDescription
     text: currentCollection.extra['short-description'] || ""
-    color: "#3a3a3a"
+    color: colorFontTinted
     font.family: subheaderFont.name
     font.pixelSize: vpx(fontSizeSubheader)
     minimumPixelSize: vpx(fontSizeSubheaderMin)
@@ -89,7 +89,7 @@ Item {
   Text {
     id: textCollectionName
     text: "%1".arg(currentCollection.name) || ""
-    color: "white"
+    color: colorFontStrong
     font.bold: true
     font.family: headerFont.name
     font.pixelSize: vpx(fontSizeHeader)
@@ -112,7 +112,7 @@ Item {
   Text {
     id: textCollectionGameCount
     text: "%1 AVAILABLE GAMES".arg(currentCollection.games.count)
-    color: "#e1303a"
+    color: colorFontRed
     font.family: subheaderFont.name
     font.pixelSize: vpx(fontSizeSubheader)
     minimumPixelSize: vpx(fontSizeSubheaderMin)
@@ -128,7 +128,7 @@ Item {
   Text {
     id: textCollectionDescription
     text: Utils.formatDescription(currentCollection.extra.description)
-    color: "#888888"
+    color: colorFont
     font.family: subheaderFont.name
     font.pixelSize: vpx(fontSizeDescription)
     minimumPixelSize: vpx(fontSizeDescriptionMin)

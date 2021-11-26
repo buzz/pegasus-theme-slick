@@ -53,6 +53,13 @@ FocusScope {
     }
   }
 
+  Keys.onPressed: {
+    if (api.keys.isFilters(event)) {
+      event.accepted = true;
+      console.log("FILTER");
+    }
+  }
+
   states: [
     State {
       when: detailsView.focus
@@ -65,7 +72,7 @@ FocusScope {
 
   transitions: Transition {
     AnchorAnimation {
-      duration: 320
+      duration: durationMedium
       easing.type: Easing.OutExpo
     }
   }

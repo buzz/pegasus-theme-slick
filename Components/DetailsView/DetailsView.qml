@@ -4,10 +4,11 @@ import "GameGrid"
 import "GameDetails"
 
 FocusScope {
-  id: root
+  id: detailsView
 
   property var currentCollection
   property alias currentGameIndex: grid.currentGameIndex
+  property bool zoomSelectedItem: true
   readonly property var currentGame: currentCollection.games.get(currentGameIndex)
 
   width: parent.width
@@ -38,18 +39,32 @@ FocusScope {
     if (api.keys.isNextPage(event)) {
       event.accepted = true;
       nextCollection();
+      delaySelectedZoom();
       return;
     }
     if (api.keys.isPrevPage(event)) {
       event.accepted = true;
       prevCollection();
+      delaySelectedZoom();
       return;
     }
   }
 
+  // Prevent initial animation glitch on selected item
+  function delaySelectedZoom() {
+    zoomSelectedItem = false;
+    timerSelectedZoom.restart();
+  }
+
+  Timer {
+    id: timerSelectedZoom
+    interval: 100
+    onTriggered: zoomSelectedItem = true
+  }
+
   // Background
   Rectangle {
-    color: "#0c0c0c"
+    color: colorBg
     anchors.fill: parent
   }
 

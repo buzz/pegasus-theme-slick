@@ -8,7 +8,7 @@ Item {
   anchors.fill: parent
 
   Rectangle {
-    color: "#0c0c0c"
+    color: colorBg
     anchors.fill: parent
   }
 

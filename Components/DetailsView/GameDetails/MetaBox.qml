@@ -17,7 +17,7 @@ Rectangle {
       id: metaBox
       width: root.width
       height: root.height
-      color: "#ccc"
+      color: colorBgBox
       clip: true
 
       Text {
@@ -42,7 +42,7 @@ Rectangle {
       Text {
         id: metaValue
         text: metaContent
-        color: "#222"
+        color: colorFontBox
         width: parent.width
         height: parent.height
         font.family: headerFont.name

@@ -81,7 +81,7 @@ Item {
       delegate: GameGridItem {
         width: GridView.view.cellWidth
         height: GridView.view.cellHeight
-        state: GridView.isCurrentItem && "selected"
+        state: detailsView.focus && detailsView.zoomSelectedItem && GridView.isCurrentItem ? "selected" : ""
         columnCount: GridView.view.columnCount
 
         game: modelData
@@ -90,9 +90,7 @@ Item {
           return gridView.firstImageLoaded ? gridView.cellHeightRatio : 0.5;
         }
 
-        onClicked: {
-          gridView.currentIndex = index;
-        }
+        onClicked: gridView.currentIndex = index
 
         onDoubleClicked: {
           gridView.currentIndex = index;

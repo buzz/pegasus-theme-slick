@@ -26,8 +26,8 @@ FocusScope {
 
   signal collectionSelected
 
-  Keys.onLeftPressed: { selectPrev(); }
-  Keys.onRightPressed: { selectNext(); }
+  Keys.onLeftPressed: selectPrev()
+  Keys.onRightPressed: selectNext()
 
   Keys.onPressed: {
     if (api.keys.isAccept(event)) {

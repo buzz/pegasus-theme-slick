@@ -16,7 +16,7 @@ Item {
 
       Layout.alignment: Qt.AlignVBottom | Qt.AlignLeft
       text: currentCollection.name || "Not Found"
-      color: "#888888"
+      color: colorFont
       font.pixelSize: vpx(32)
       font.family: headerFont.name
       font.capitalization: Font.AllUppercase
@@ -65,7 +65,7 @@ Item {
         text: currentGame.description
         wrapMode: Text.WordWrap
         elide: Text.ElideRight
-        color: "#888888"
+        color: colorFont
         anchors {
           fill: parent
           horizontalCenter: parent.horizontalCenter
@@ -81,7 +81,7 @@ Item {
       color: "transparent"
       clip: false
 
-      Rectangle {
+      Item {
         // TODO: make width/height adhere to platform specific ratios so screenshots
         // and videos "fit nicely". Currently forced to 4/3.
         // 16:9 :: 608 x 342 (PSVita)
@@ -90,14 +90,13 @@ Item {
         id: screenshot
         width: vpx(504)
         height: vpx(378)
-        color: "#00f3f3f3"
 
         anchors {
           horizontalCenter: parent.horizontalCenter
           verticalCenter: parent.verticalCenter
         }
 
-        GameVideoItem {
+        GamePreviewItem {
           id: screenshotImage
           anchors { fill: parent }
 

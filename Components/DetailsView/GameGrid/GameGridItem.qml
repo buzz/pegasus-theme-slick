@@ -62,18 +62,18 @@ Item {
     PropertyAnimation {
       target: gridItem
       property: "z"
-      duration: durationFast
+      duration: durationShort
     }
     PropertyAnimation {
       target: translation
       property: "x"
-      duration: durationFast
+      duration: durationShort
       easing.type: Easing.InOutCubic
     }
     PropertyAnimation {
       target: boxArt
       property: "scale"
-      duration: durationFast
+      duration: durationShort
       easing.type: Easing.InOutCubic
     }
   }
@@ -134,9 +134,9 @@ Item {
       }
       border {
         width: vpx(8)
-        color: "#333"
+        color: colorBoxBorder
       }
-      color: "#888"
+      color: colorBgBox
       visible: !game.assets.boxFront
 
       Item {
@@ -164,7 +164,7 @@ Item {
           wrapMode: Text.WrapAnywhere
           horizontalAlignment: Text.AlignHCenter
           verticalAlignment: Text.AlignVCenter
-          color: "#222"
+          color: colorFontBox
           font {
             pixelSize: vpx(48)
             family: headerFont.name
@@ -197,7 +197,7 @@ Item {
           loops: Animator.Infinite;
           from: 0;
           to: 360;
-          duration: 1333
+          duration: durationLoadingSpinner
         }
       }
     }
