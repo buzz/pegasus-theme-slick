@@ -1,36 +1,37 @@
-import QtQuick 2.8
-import QtMultimedia 5.9
+import QtQuick 2.15
+import QtMultimedia 5.15
 import QtGraphicalEffects 1.12
 
 Item {
   property var game
-  property var collectionView
-  property var detailView
-  property var collectionShortName
+
+  property bool gamelistView: gamelistScreen.focus
+
   property bool steam: false
   property bool hasImage: getImageSource().length
 
   onGameChanged: {
+    console.log("GamePreviewItem:onGameChanged", game);
     videoPreviewLoader.sourceComponent = undefined;
-    if (detailView) {
+    if (gamelistView) {
       showImage();
       timerHideImage.stop();
       timerVideoDelay.restart();
     }
   }
 
-  onCollectionViewChanged: {
-    if (collectionView) {
+  onGamelistViewChanged: {
+    if (gamelistView) {
+      videoPreviewLoader.sourceComponent = undefined;
+      timerVideoDelay.restart();
+    } else {
       videoPreviewLoader.sourceComponent = undefined;
       showImage();
       timerHideImage.stop();
       timerVideoDelay.stop();
-    } else {
-      videoPreviewLoader.sourceComponent = undefined;
-      timerVideoDelay.restart();
     }
 
-    if (collectionShortName == "steam") {
+    if (collection.shortName == "steam") {
       steam = true
     } else {
       steam = false
@@ -42,7 +43,7 @@ Item {
     id: timerVideoDelay
     interval: 500
     onTriggered: {
-      if (game.assets.videos.length) {
+      if (game && game.assets.videos.length) {
         videoPreviewLoader.sourceComponent = videoPreviewWrapper;
         if (hasImage) {
           timerHideImage.restart();
@@ -70,12 +71,14 @@ Item {
   }
 
   function getImageSource() {
-    if (steam && game.assets.logo)
-      return game.assets.logo;
-    if (game.assets.screenshots[0])
-      return game.assets.screenshots[0];
-    if (game.assets.poster)
-      return game.assets.poster;
+    if (game) {
+      if (steam && game.assets.logo)
+        return game.assets.logo;
+      if (game.assets.screenshots[0])
+        return game.assets.screenshots[0];
+      if (game.assets.poster)
+        return game.assets.poster;
+    }
     return "";
   }
 

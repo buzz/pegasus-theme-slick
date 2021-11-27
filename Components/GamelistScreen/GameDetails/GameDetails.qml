@@ -1,8 +1,12 @@
-import QtQuick 2.8
+import QtQuick 2.15
 import QtQuick.Layouts 1.11
-import "../utils.js" as Utils
+import "utils.js" as Utils
 
 Item {
+  id: gameDetails
+
+  required property var game
+
   ColumnLayout {
     anchors {
       fill: parent
@@ -15,23 +19,18 @@ Item {
       id: collectionName
 
       Layout.alignment: Qt.AlignVBottom | Qt.AlignLeft
-      text: currentCollection.name || "Not Found"
+      text: collection.name || "Not Found"
       color: colorFont
       font.pixelSize: vpx(32)
       font.family: headerFont.name
       font.capitalization: Font.AllUppercase
       lineHeight: 0.85
-      Behavior on text {
-        FadeAnimation {
-          target: collectionName
-        }
-      }
     }
 
     // Game title
     Text {
       color: "white"
-      text: currentGame.title
+      text: game.title
       font.pixelSize: vpx(56)
       font.family: headerFont.name
       Layout.alignment: Qt.AlignVTop | Qt.AlignLeft
@@ -43,14 +42,14 @@ Item {
     // Meta boxes
     RowLayout {
       spacing: vpx(10)
-      MetaBox { metaTitle: 'PLAYERS'; metaContent: currentGame.players }
-      MetaBox { metaTitle: 'RATING'; metaContent: currentGame.rating === "" ? "N/A" : Math.round(currentGame.rating * 100) + '%'}
-      MetaBox { metaTitle: 'RELEASED'; metaContent: Utils.formatDate(currentGame.release) || "N/A" }
-      MetaBox { metaTitle: 'GENRE'; metaContent: currentGame.genreList[0] || "N/A" }
-      MetaBox { metaTitle: 'DEVELOPER'; metaContent: currentGame.developerList[0]  || "N/A" }
-      MetaBox { metaTitle: 'PUBLISHER'; metaContent: currentGame.publisherList[0] || "N/A" }
-      MetaBox { metaTitle: 'LAST PLAYED'; metaContent: Utils.formatLastPlayed(currentGame.lastPlayed) }
-      MetaBox { metaTitle: 'TIME PLAYED'; metaContent: Utils.formatPlayTime(currentGame.playTime) }
+      MetaBox { metaTitle: 'PLAYERS'; metaContent: game.players }
+      MetaBox { metaTitle: 'RATING'; metaContent: game.rating === "" ? "N/A" : Math.round(game.rating * 100) + '%'}
+      MetaBox { metaTitle: 'RELEASED'; metaContent: Utils.formatDate(game.release) || "N/A" }
+      MetaBox { metaTitle: 'GENRE'; metaContent: game.genreList[0] || "N/A" }
+      MetaBox { metaTitle: 'DEVELOPER'; metaContent: game.developerList[0]  || "N/A" }
+      MetaBox { metaTitle: 'PUBLISHER'; metaContent: game.publisherList[0] || "N/A" }
+      MetaBox { metaTitle: 'LAST PLAYED'; metaContent: Utils.formatLastPlayed(game.lastPlayed) }
+      MetaBox { metaTitle: 'TIME PLAYED'; metaContent: Utils.formatPlayTime(game.playTime) }
     }
 
     // Game description
@@ -62,7 +61,7 @@ Item {
       Text {
         font.pixelSize: vpx(14)
         font.family: subheaderFont.name
-        text: currentGame.description
+        text: game.description
         wrapMode: Text.WordWrap
         elide: Text.ElideRight
         color: colorFont
@@ -97,13 +96,9 @@ Item {
         }
 
         GamePreviewItem {
-          id: screenshotImage
-          anchors { fill: parent }
+          anchors.fill: parent
 
-          game: currentGame
-          collectionView: collectionsView.focus
-          detailView: detailsView.focus
-          collectionShortName: currentCollection.shortName
+          game: gameDetails.game
         }
       }
     }

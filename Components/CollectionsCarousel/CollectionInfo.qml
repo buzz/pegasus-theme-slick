@@ -1,100 +1,95 @@
-import QtQuick 2.8
+import QtQuick 2.15
 import "../utils.js" as Utils
 
 Item {
-  id: collectionDetails
-
-  property var currentCollection
-
-  anchors.fill: parent
-
   Text {
     id: textSystemYear
-    text: currentCollection.extra.year || ""
+    text: extra.year || ""
     color: colorFont
     font.family: subheaderFont.name
-    font.pixelSize: vpx(fontSizeSubheader)
-    minimumPixelSize: vpx(fontSizeSubheaderMin)
+    font.pixelSize: fontSizeSubheader
+    minimumPixelSize: fontSizeSubheaderMin
 
     anchors {
       left: parent.left
-      leftMargin: vpx(marginLeft)
+      leftMargin: marginHoriz
       top: parent.top
-      topMargin: vpx(marginTop)
+      topMargin: marginVert
     }
   }
 
   Text {
     id: textDot1
-    text: currentCollection.extra.year ? " · " : ""
+    text: extra.year ? " · " : ""
     color: colorFontLightlyTinted
     font.family: subheaderFont.name
-    font.pixelSize: vpx(fontSizeSubheader)
-    minimumPixelSize: vpx(fontSizeSubheaderMin)
+    font.pixelSize: fontSizeSubheader
+    minimumPixelSize: fontSizeSubheaderMin
 
     anchors {
       left: textSystemYear.right
       top: parent.top
-      topMargin: vpx(marginTop)
+      topMargin: marginVert
     }
   }
 
   Text {
     id: textSystemCompany
-    text: currentCollection.extra['company'] || ""
+    text: extra["company"] || ""
     color: colorFont
     font.family: subheaderFont.name
-    font.pixelSize: vpx(fontSizeSubheader)
-    minimumPixelSize: vpx(fontSizeSubheaderMin)
+    font.pixelSize: fontSizeSubheader
+    minimumPixelSize: fontSizeSubheaderMin
     font.capitalization: Font.AllUppercase
 
     anchors {
       left: textDot1.right
       top: parent.top
-      topMargin: vpx(marginTop)
+      topMargin: marginVert
     }
   }
 
   Text {
     id: textDot2
-    text: currentCollection.extra['company'] ? " · " : ""
+    text: extra["company"] ? " · " : ""
     color: colorFontLightlyTinted
     font.family: subheaderFont.name
-    font.pixelSize: vpx(fontSizeSubheader)
-    minimumPixelSize: vpx(fontSizeSubheaderMin)
+    font.pixelSize: fontSizeSubheader
+    minimumPixelSize: fontSizeSubheaderMin
 
     anchors {
       left: textSystemCompany.right
       top: parent.top
-      topMargin: vpx(marginTop)
+      topMargin: marginVert
     }
   }
 
   Text {
     id: textSystemShortDescription
-    text: currentCollection.extra['short-description'] || ""
+    text: extra["short-description"] || ""
     color: colorFontTinted
     font.family: subheaderFont.name
-    font.pixelSize: vpx(fontSizeSubheader)
-    minimumPixelSize: vpx(fontSizeSubheaderMin)
+    font.pixelSize: fontSizeSubheader
+    minimumPixelSize: fontSizeSubheaderMin
     font.capitalization: Font.AllUppercase
 
     anchors {
       left: textDot2.right
       top: parent.top
-      topMargin: vpx(marginTop)
+      topMargin: marginVert
     }
   }
 
   Text {
     id: textCollectionName
-    text: "%1".arg(currentCollection.name) || ""
+    text: "%1".arg(name) || ""
     color: colorFontStrong
     font.bold: true
     font.family: headerFont.name
-    font.pixelSize: vpx(fontSizeHeader)
-    minimumPixelSize: vpx(fontSizeHeaderMin)
+    font.pixelSize: fontSizeHeader
+    minimumPixelSize: fontSizeHeaderMin
     font.capitalization: Font.AllUppercase
+    font.letterSpacing: -vpx(1.0)
     fontSizeMode: Text.Fit
     lineHeight: 0.9
     maximumLineCount: 2
@@ -103,7 +98,7 @@ Item {
 
     anchors {
       left: parent.left
-      leftMargin: vpx(marginLeft)
+      leftMargin: marginHoriz
       top: textSystemShortDescription.bottom
       topMargin: vpx(25)
     }
@@ -111,15 +106,15 @@ Item {
 
   Text {
     id: textCollectionGameCount
-    text: "%1 AVAILABLE GAMES".arg(currentCollection.games.count)
+    text: "%1 AVAILABLE GAMES".arg(games.count)
     color: colorFontRed
     font.family: subheaderFont.name
-    font.pixelSize: vpx(fontSizeSubheader)
-    minimumPixelSize: vpx(fontSizeSubheaderMin)
+    font.pixelSize: fontSizeSubheader
+    minimumPixelSize: fontSizeSubheaderMin
 
     anchors {
       left: parent.left
-      leftMargin: vpx(marginLeft)
+      leftMargin: marginHoriz
       top: textCollectionName.bottom
       topMargin: vpx(22)
     }
@@ -127,17 +122,17 @@ Item {
 
   Text {
     id: textCollectionDescription
-    text: Utils.formatDescription(currentCollection.extra.description)
+    text: Utils.formatDescription(extra.description)
     color: colorFont
     font.family: subheaderFont.name
-    font.pixelSize: vpx(fontSizeDescription)
-    minimumPixelSize: vpx(fontSizeDescriptionMin)
+    font.pixelSize: fontSizeDescription
+    minimumPixelSize: fontSizeDescriptionMin
     width: vpx(420)
     wrapMode: Text.Wrap
 
     anchors {
       left: parent.left
-      leftMargin: vpx(marginLeft)
+      leftMargin: marginHoriz
       top: textCollectionGameCount.bottom
       topMargin: vpx(14)
     }

@@ -1,4 +1,4 @@
-import QtQuick 2.8
+import QtQuick 2.15
 import QtGraphicalEffects 1.12
 
 Item {
@@ -6,30 +6,30 @@ Item {
   height: width * imageHeightRatio
   z: 1
 
-  property var game
-  property int columnCount
+  required property var modelData
+  required property int index
+  required property int columnCount
 
   property alias imageWidth: imageBoxArt.paintedWidth
   property alias imageHeight: imageBoxArt.paintedHeight
   property bool imageLoading: imageBoxArt.status === Image.Loading
   property real imageHeightRatio: 0.5
 
-  signal clicked()
-  signal doubleClicked()
+  signal clicked
+  signal doubleClicked
   signal imageLoaded(int imgWidth, int imgHeight)
 
   readonly property int tilePadding: 4
 
-  readonly property bool firstColumn: index % columnCount === 0
-  readonly property bool lastColumn: index % columnCount === columnCount - 1
-
   // Keep outmost left/right items within grid bounds
   property real translateX: {
     if (index % columnCount === 0) {
-      return (width - tilePadding) / 2 - 24; // First column
+      // First column
+      return (width - tilePadding) / 2 - 24;
     }
     if (index % columnCount === columnCount - 1) {
-      return - (width - tilePadding) / 2 + 24; // Last column
+      // Last column
+      return - (width - tilePadding) / 2 + 24;
     }
     return 0;
   }
@@ -111,9 +111,9 @@ Item {
       }
 
       asynchronous: true
-      visible: game.assets.boxFront
+      visible: modelData.assets.boxFront
 
-      source: game.assets.boxFront || ""
+      source: modelData.assets.boxFront || ""
       sourceSize { width: 512; height: 512 }
       fillMode: Image.PreserveAspectFit
       smooth: true
@@ -136,8 +136,8 @@ Item {
         width: vpx(8)
         color: colorBoxBorder
       }
-      color: colorBgBox
-      visible: !game.assets.boxFront
+      color: colorBgBoxArt
+      visible: !modelData.assets.boxFront
 
       Item {
         anchors.fill: parent
@@ -160,7 +160,7 @@ Item {
             fill: parent
             margins: vpx(16)
           }
-          text: game.title
+          text: modelData.title || ""
           wrapMode: Text.WrapAnywhere
           horizontalAlignment: Text.AlignHCenter
           verticalAlignment: Text.AlignVCenter

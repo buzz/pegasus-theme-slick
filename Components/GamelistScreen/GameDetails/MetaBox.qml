@@ -1,4 +1,4 @@
-import QtQuick 2.8
+import QtQuick 2.15
 import QtQuick.Layouts 1.11
 
 Rectangle {
@@ -17,12 +17,12 @@ Rectangle {
       id: metaBox
       width: root.width
       height: root.height
-      color: colorBgBox
+      color: colorBgMetaBox
       clip: true
 
       Text {
         text: metaTitle
-        color: "black"
+        color: colorFontBox
         width: parent.width
         font.family: subheaderFont.name
         fontSizeMode: Text.Fit
@@ -42,7 +42,7 @@ Rectangle {
       Text {
         id: metaValue
         text: metaContent
-        color: colorFontBox
+        color: colorFontBoxValue
         width: parent.width
         height: parent.height
         font.family: headerFont.name
