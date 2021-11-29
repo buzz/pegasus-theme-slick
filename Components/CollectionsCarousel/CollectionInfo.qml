@@ -35,7 +35,7 @@ Item {
 
   Text {
     id: textSystemCompany
-    text: extra["company"] || ""
+    text: extra.company || ""
     color: colorFont
     font.family: subheaderFont.name
     font.pixelSize: fontSizeSubheader
@@ -51,7 +51,7 @@ Item {
 
   Text {
     id: textDot2
-    text: extra["company"] ? " · " : ""
+    text: extra.company ? " · " : ""
     color: colorFontLightlyTinted
     font.family: subheaderFont.name
     font.pixelSize: fontSizeSubheader
@@ -66,7 +66,7 @@ Item {
 
   Text {
     id: textSystemShortDescription
-    text: extra["short-description"] || ""
+    text: summary || ""
     color: colorFontTinted
     font.family: subheaderFont.name
     font.pixelSize: fontSizeSubheader
@@ -122,7 +122,7 @@ Item {
 
   Text {
     id: textCollectionDescription
-    text: Utils.formatDescription(extra.description)
+    text: description
     color: colorFont
     font.family: subheaderFont.name
     font.pixelSize: fontSizeDescription
