@@ -5,13 +5,13 @@ import "utils.js" as Utils
 Item {
   id: gameDetails
 
-  required property var game
+  property var game: gamelistSearchFilter.get(currentGameIndex)
 
   ColumnLayout {
     anchors {
       fill: parent
-      leftMargin: vpx(40)
-      topMargin: vpx(40)
+      leftMargin: marginHorizGamelistScreen
+      topMargin: marginVertGamelistScreen
     }
 
     // Collection name
@@ -19,20 +19,21 @@ Item {
       id: collectionName
 
       Layout.alignment: Qt.AlignVBottom | Qt.AlignLeft
-      text: collection.name || "Not Found"
+      text: collection && collection.name ? collection.name : ""
       color: colorFont
-      font.pixelSize: vpx(32)
-      font.family: headerFont.name
+      font.pixelSize: fontSizeGameDetailsSubheader
+      font.family: generalFont.name
       font.capitalization: Font.AllUppercase
-      lineHeight: 0.85
+      lineHeight: 0.9
     }
 
     // Game title
     Text {
-      color: "white"
-      text: game.title
-      font.pixelSize: vpx(56)
+      color: colorFontStrong
+      text: game && game.title ? game.title : ""
+      font.pixelSize: fontSizeGameDetailsHeader
       font.family: headerFont.name
+      font.bold: true
       Layout.alignment: Qt.AlignVTop | Qt.AlignLeft
       Layout.fillWidth: true
       Layout.preferredWidth: parent.width
@@ -41,58 +42,48 @@ Item {
 
     // Meta boxes
     RowLayout {
-      spacing: vpx(10)
-      MetaBox { metaTitle: 'PLAYERS'; metaContent: game.players }
-      MetaBox { metaTitle: 'RATING'; metaContent: game.rating === "" ? "N/A" : Math.round(game.rating * 100) + '%'}
-      MetaBox { metaTitle: 'RELEASED'; metaContent: Utils.formatDate(game.release) || "N/A" }
-      MetaBox { metaTitle: 'GENRE'; metaContent: game.genreList[0] || "N/A" }
-      MetaBox { metaTitle: 'DEVELOPER'; metaContent: game.developerList[0]  || "N/A" }
-      MetaBox { metaTitle: 'PUBLISHER'; metaContent: game.publisherList[0] || "N/A" }
-      MetaBox { metaTitle: 'LAST PLAYED'; metaContent: Utils.formatLastPlayed(game.lastPlayed) }
-      MetaBox { metaTitle: 'TIME PLAYED'; metaContent: Utils.formatPlayTime(game.playTime) }
+      spacing: spacingStd
+      MetaBox { metaTitle: 'PLAYERS'; metaContent: game && game.players ? game.players : "" }
+      MetaBox { metaTitle: 'RATING'; metaContent: game && game.rating ? `${Math.round(game.rating * 100)}%`  : "N/A"}
+      MetaBox { metaTitle: 'RELEASED'; metaContent: game && game.releaseYear > 0 ? game.releaseYear : "N/A" }
+      MetaBox { metaTitle: 'GENRE'; metaContent: game && game.genre ? game.genre : "N/A" }
+      MetaBox { metaTitle: 'DEVELOPER'; metaContent: game && game.developer ? game.developer : "N/A" }
+      MetaBox { metaTitle: 'PUBLISHER'; metaContent: game && game.publisher ? game.publisher : "N/A" }
+      MetaBox { metaTitle: 'LAST PLAYED'; metaContent: game ? Utils.formatLastPlayed(game.lastPlayed) : "" }
+      MetaBox { metaTitle: 'TIME PLAYED'; metaContent: game ? Utils.formatPlayTime(game.playTime) : "" }
     }
 
     // Game description
     Item {
-      width: parent.width
+      Layout.fillWidth: true
       Layout.fillHeight: true
-      Layout.topMargin: vpx(10)
+      Layout.topMargin: spacingStd
 
       Text {
-        font.pixelSize: vpx(14)
-        font.family: subheaderFont.name
-        text: game.description
+        font.pixelSize: fontSizeRegular
+        font.family: generalFont.name
+        text: game && game.description ? game.description : ""
         wrapMode: Text.WordWrap
         elide: Text.ElideRight
         color: colorFont
-        anchors {
-          fill: parent
-          horizontalCenter: parent.horizontalCenter
-        }
+        anchors.fill: parent
       }
     }
 
     // Video
-    Rectangle {
+    Item {
       id: screenshotBox
       height: vpx(400)
-      width: parent.width
-      color: "transparent"
-      clip: false
+      Layout.fillWidth: true
 
       Item {
-        // TODO: make width/height adhere to platform specific ratios so screenshots
-        // and videos "fit nicely". Currently forced to 4/3.
-        // 16:9 :: 608 x 342 (PSVita)
-        // 3:2 :: 612:408 (GBA/GB)
-        // 8:7 :: 608:532 (NES)
         id: screenshot
-        width: vpx(504)
-        height: vpx(378)
 
         anchors {
+          fill: parent
           horizontalCenter: parent.horizontalCenter
           verticalCenter: parent.verticalCenter
+          bottomMargin: marginVertGamelistScreen
         }
 
         GamePreviewItem {

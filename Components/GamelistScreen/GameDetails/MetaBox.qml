@@ -24,10 +24,9 @@ Rectangle {
         text: metaTitle
         color: colorFontBox
         width: parent.width
-        font.family: subheaderFont.name
+        font.family: generalFont.name
         fontSizeMode: Text.Fit
-        minimumPixelSize: vpx(8)
-        font.pixelSize: vpx(10)
+        font.pixelSize: spacingStd
         font.weight: Font.Bold
         font.capitalization: Font.AllUppercase
         horizontalAlignment: Text.AlignHCenter
@@ -49,7 +48,6 @@ Rectangle {
         font.weight: Font.Bold
         font.capitalization: Font.AllUppercase
         fontSizeMode: Text.Fit
-        minimumPixelSize: vpx(12)
         font.pixelSize: vpx(44)
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

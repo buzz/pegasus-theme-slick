@@ -36,3 +36,7 @@ can then select it in the settings menu of Pegasus.
 ## License
 
 [![CC-BY-NC-SA](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+Content licensed under [CC-BY-NC-SA](http://creativecommons.org/licenses/by-nc-sa/4.0/) unless otherwise noted.
+
+Font Awesome icons licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/).

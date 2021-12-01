@@ -12,10 +12,10 @@ Item {
       top: collectionScreen.top
       right: collectionScreen.right
       bottom: collectionScreen.bottom
-      topMargin: marginVert * 1.33
-      rightMargin: marginHoriz / 2
-      bottomMargin: marginVert / 2
-      leftMargin: marginHoriz
+      topMargin: marginVertCollectionScreen * 1.33
+      rightMargin: marginHorizCollectionScreen / 2
+      bottomMargin: marginVertCollectionScreen / 2
+      leftMargin: marginHorizCollectionScreen
     }
 
     width: collectionScreen.width / 1.67
@@ -30,11 +30,14 @@ Item {
     }
 
     // Colored glow
-    FastBlur {
+    GaussianBlur {
       anchors.fill: bgImg
 
+      cached: true
       source: bgImg
       radius: vpx(32)
+      samples: vpx(65)
+
       transparentBorder: true
     }
 
@@ -52,13 +55,13 @@ Item {
       visible: true
       asynchronous: true
       fillMode: Image.PreserveAspectFit
-      source: "../../assets/backgrounds/%1.webp".arg(shortName)
+      source: `../../assets/backgrounds/${shortName}.webp`
       smooth: true
     }
   }
 
   // Collection info text
-  CollectionInfo {
+  CollectionDetails {
     anchors.fill: parent
 
     transform: Translate {

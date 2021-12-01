@@ -8,32 +8,21 @@ FocusScope {
 
   property var collection
 
+  property alias currentGameIndex: grid.currentGameIndex
+
   signal itemSelected(int gameIndex)
   signal back
 
-  onCollectionChanged: {
-    console.log("GamelistScreen:onCollectionChanged", collection);
-    resetSelected(collection);
-  }
+  onCollectionChanged:  Qt.callLater(resetSelected)
+  onFocusChanged: focus && Qt.callLater(resetSelected)
 
-  onFocusChanged: {
-    console.log("GamelistScreen:onFocusChanged");
-    if (focus)
-      resetSelected(collection);
-  }
-
-  function resetSelected(collection) {
-    grid.resetSelectedItem(collection && restoreGameIndex(collection.shortName));
-  }
-
-  function getCurrentGameIndex() {
-    return grid.currentGameIndex;
+  function resetSelected() {
+    if (gamelistScreen.collection)
+      grid.resetSelectedItem(restoreGameIndex(gamelistScreen.collection.shortName));
   }
 
   GameDetails {
     id: gameDetails
-
-    game: collection.games.get(grid.currentGameIndex)
 
     width: parent.width / 2.2
     anchors {

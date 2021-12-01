@@ -12,7 +12,7 @@ Item {
     zoomSelectedItem = false;
     resetSelectedTimer.restart();
 
-    if (idx !== undefined) {
+    if (idx !== null) {
       gridView.positionViewAtIndex(idx, ListView.SnapPosition)
       gridView.currentIndex = idx;
     }
@@ -79,7 +79,7 @@ Item {
       preferredHighlightBegin: (height - cellHeight) / 2
       preferredHighlightEnd: (height + cellHeight) / 2
 
-      model: collection.games
+      model: gamelistSearchFilter
 
       property real columnCount: {
         if (cellHeightRatio > 1.2) return 5;
@@ -155,7 +155,6 @@ Item {
         }
 
         function selectItem() {
-          // console.log("selectItem", index);
           gridView.currentIndex = index
         }
       }

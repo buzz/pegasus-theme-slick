@@ -147,7 +147,7 @@ Item {
           text: "?"
           font {
             pixelSize: vpx(9999)
-            family: subheaderFont.name
+            family: generalFont.name
           }
           color: "#777"
           fontSizeMode: Text.Fit
@@ -176,6 +176,7 @@ Item {
     // Loading spinner
     Item {
       visible: imageLoading
+
       anchors {
         fill: parent
         margins: vpx(tilePadding)
@@ -189,9 +190,21 @@ Item {
       }
 
       Image {
+        id: loadingSpinner
+
+        height: vpx(32)
         anchors.centerIn: parent
 
-        source: "../../../assets/loading-spinner.png"
+        source: "../../../assets/circle-notch-solid.svg"
+        fillMode: Image.PreserveAspectFit
+        smooth: true
+        visible: false
+      }
+
+      ColorOverlay {
+        anchors.fill: loadingSpinner
+        source: loadingSpinner
+        color: colorFontStrong
 
         RotationAnimator on rotation {
           loops: Animator.Infinite;

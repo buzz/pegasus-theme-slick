@@ -1,172 +1,166 @@
 import QtQuick 2.15
 import QtGraphicalEffects 1.12
 
-import "CollectionsCarousel"
-import "GamelistScreen"
+import "SearchFilter"
+import "Options"
 
 FocusScope {
   id: main
 
-  FontLoader { id: headerFont; source: "../assets/fonts/BebasNeue.otf" }
-  FontLoader { id: subheaderFont; source: "../assets/fonts/Acre.otf" }
-
   property int restoredCollectionIndex
 
-  Component.onCompleted: {
-    restoredCollectionIndex = restoreCollectionIndex();
-  }
+  Component.onCompleted: restoredCollectionIndex = restoreCollectionIndex()
 
   Component.onDestruction: {
     saveCollectionIndex();
     saveGameIndex();
   }
 
+  // Search/filter collection
+
+  property string searchTextCollections: ""
+  property var sortIndexCollections: 0
+  property string prevCollectionShortName: "" // remember collection to jump to after filter/sort
+
+  property string searchTextGamelist: ""
+  property var sortIndexGamelist: 1
+  property string prevGameShortName: "" // remember game to jump to after filter/sort
+
+  CollectionSortFilterProxyModel {
+    id: collectionSearchFilter
+
+    sourceModel: api.collections
+
+    searchText: main.searchTextCollections
+    sortIndex: main.sortIndexCollections
+
+    // Restore collection from before filter/sort
+    onChanged: {
+      if (prevCollectionShortName) {
+        mainSwitcher.goToCollection(prevCollectionShortName);
+        prevCollectionShortName = "";
+      }
+    }
+  }
+
+  GamelistSortFilterProxyModel {
+    id: gamelistSearchFilter
+
+    sourceModel: collectionSearchFilter.get(mainSwitcher.currentCollectionsIndex).games
+
+    searchText: main.searchTextGamelist
+    sortIndex: main.sortIndexGamelist
+
+    // Restore game from before filter/sort
+    onChanged: {
+      if (prevGameShortName) {
+        mainSwitcher.goToGame(prevGameShortName);
+        prevGameShortName = "";
+      }
+    }
+  }
+
+  Keys.onPressed: {
+    if (api.keys.isFilters(event)) {
+      event.accepted = true;
+      options.focus = true;
+    }
+  }
+
   function restoreCollectionIndex() {
-    console.log(`main:restoreCollectionIndex`, api.memory.get('collectionIndex') || 0)
     return api.memory.get('collectionIndex') || 0;
   }
 
-  function saveCollectionIndex(idx) {
-    console.log(`main:saveCollectionIndex`, collectionsCarousel.currentIndex)
-    api.memory.set('collectionIndex', collectionsCarousel.currentIndex);
+  function saveCollectionIndex() {
+    api.memory.set('collectionIndex', mainSwitcher.currentCollectionsIndex);
   }
 
   function restoreGameIndex(collectionShortName) {
-    console.log(`main:restoreGameIndex ${collectionShortName}`, api.memory.get(`${collectionShortName}GameIndex`) || 0)
     return api.memory.get(`${collectionShortName}GameIndex`) || 0;
   }
 
   function saveGameIndex() {
-    const collection = api.collections.get(collectionsCarousel.currentIndex);
-    const gameIdx = gamelistScreen.getCurrentGameIndex();
-    console.log(`main:saveGameIndex ${collection.shortName} ${gameIdx}`);
-    if (collection && gameIdx !== undefined) {
+    const collection = api.collections.get(mainSwitcher.currentCollectionsIndex);
+    const gameIdx = mainSwitcher.currentGameIndex;
+    if (collection && gameIdx !== null) {
       api.memory.set(`${collection.shortName}GameIndex`, gameIdx);
     }
   }
 
   function launchGame(collection, game) {
-    console.log(`main:launchGame ${collection.shortName} ${game.name}`);
+    // TODO: save collection/state and restore after returning to pegasus
     game.launch();
   }
 
-  Keys.onPressed: {
-    if (!collectionsCarousel.horizontalVelocity) {
-      if (api.keys.isNextPage(event)) {
-        console.log("main:NextPage");
-        event.accepted = true;
-        saveGameIndex();
-        collectionsCarousel.incrementCurrentIndex();
-      } else if (api.keys.isPrevPage(event)) {
-        console.log("main:PrevPage");
-        event.accepted = true;
-        saveGameIndex();
-        collectionsCarousel.decrementCurrentIndex();
-      }
-    }
+  MainSwitcher {
+    id: mainSwitcher
+    anchors.fill: parent
+    focus: true
   }
 
-  // Background
-  Item {
+  // Options
+  MouseArea { // Prevent mouse actions on lower elements
+    anchors.fill: parent
+    enabled: options.focus
+  }
+  GaussianBlur {
     anchors.fill: parent
 
-    Image {
-      anchors.fill: parent
+    source: mainSwitcher
+    radius: options.focus ? vpx(24) : 0
+    samples: vpx(49)
 
-      source: "../assets/background-noise.webp"
-      fillMode: Image.Tile
-    }
-
-    LinearGradient {
-      anchors.fill: parent
-
-      cached: true
-      gradient: Gradient {
-        GradientStop { position: 0.0; color: colorBgTop}
-        GradientStop { position: 0.667; color: colorBgCenter}
-        GradientStop { position: 1.0; color: colorBgBottom}
+    Behavior on radius {
+      PropertyAnimation {
+        duration: durationShort
+        easing.type: Easing.OutQuad
       }
     }
   }
+  Options {
+    id: options
 
-  CollectionsCarousel {
-    id: collectionsCarousel
+    collectionsView: mainSwitcher.collectionsView
 
-    focus: true
+    anchors.fill: parent
+    opacity: 0
 
-    width: main.width
-    height: main.height
-    anchors.bottom: parent.bottom
-
-    onCurrentIndexChanged: {
-      console.log("main:CollectionsCarousel:onCurrentIndexChanged", currentIndex);
-      gamelistScreen.collection = api.collections.get(currentIndex);
-    }
-
-    Keys.onPressed: {
-      if (api.keys.isAccept(event)) {
-        // console.log("CollectionsCarousel:itemSelected");
-        event.accepted = true;
-        saveCollectionIndex();
-        gamelistScreen.focus = true;
+    onClose: {
+      mainSwitcher.focus = true;
+      // Remember previous collection/game to jump to after updating model
+      if (mainSwitcher.collectionsView) {
+        const prevCollection = collectionSearchFilter.get(mainSwitcher.currentCollectionsIndex);
+        main.prevCollectionShortName = prevCollection ? prevCollection.shortName : "";
+      } else {
+        // TODO
       }
     }
-    Keys.onRightPressed: {
-      // console.log("CollectionsCarousel:Keys.onRightPressed moving=", horizontalVelocity);
-      if (!horizontalVelocity) {
-        event.accepted = true;
-        incrementCurrentIndex();
+
+    onSetFilterSortCollections: {
+      main.searchTextCollections = searchText;
+      main.sortIndexCollections = sortIndex;
+    }
+
+    onSetFilterSortGamelist: {
+      main.searchTextGamelist = searchText;
+      main.sortIndexGamelist = sortIndex;
+    }
+
+    Behavior on opacity {
+      PropertyAnimation {
+        duration: durationVeryShort
+        easing.type: Easing.OutQuad
       }
-    }
-    Keys.onLeftPressed: {
-      // console.log("CollectionsCarousel:Keys.onLeftPressed moving=", horizontalVelocity);
-      if (!horizontalVelocity) {
-        event.accepted = true;
-        decrementCurrentIndex();
-      }
-    }
-  }
-
-  GamelistScreen {
-    id: gamelistScreen
-
-    width: main.width
-    height: main.height
-    anchors.top: collectionsCarousel.bottom
-
-    collection: collectionsCarousel.currentItem
-
-    onBack: {
-      console.log("main:GamelistsCarousel:onBack");
-      saveCollectionIndex();
-      saveGameIndex();
-      collectionsCarousel.focus = true
-    }
-
-    onItemSelected: {
-      // console.log("main:GamelistsCarousel:onItemSelected");
-      saveCollectionIndex();
-      saveGameIndex();
-      const game = gamelistScreen.collection.games.get(gameIndex)
-      console.log("main:GamelistsCarousel:onItemSelected", game);
-      main.launchGame(gamelistScreen.collection, game);
     }
   }
 
   states: [
     State {
-      when: gamelistScreen.focus
-      AnchorChanges {
-        target: collectionsCarousel;
-        anchors.bottom: parent.top
+      when: options.focus
+      PropertyChanges {
+        target: options
+        opacity: 1.0
       }
     }
   ]
-
-  transitions: Transition {
-    AnchorAnimation {
-      duration: 666
-      easing.type: Easing.OutExpo
-    }
-  }
 }

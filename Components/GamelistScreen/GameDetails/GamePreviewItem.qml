@@ -11,7 +11,6 @@ Item {
   property bool hasImage: getImageSource().length
 
   onGameChanged: {
-    console.log("GamePreviewItem:onGameChanged", game);
     videoPreviewLoader.sourceComponent = undefined;
     if (gamelistView) {
       showImage();
@@ -43,7 +42,7 @@ Item {
     id: timerVideoDelay
     interval: 500
     onTriggered: {
-      if (game && game.assets.videos.length) {
+      if (game && game.assets && game.assets.videos && game.assets.videos.length) {
         videoPreviewLoader.sourceComponent = videoPreviewWrapper;
         if (hasImage) {
           timerHideImage.restart();
@@ -71,7 +70,7 @@ Item {
   }
 
   function getImageSource() {
-    if (game) {
+    if (game && game.assets) {
       if (steam && game.assets.logo)
         return game.assets.logo;
       if (game.assets.screenshots[0])
@@ -114,7 +113,7 @@ Item {
     Video {
       source: game.assets.videos.length ? game.assets.videos[0] : ""
       anchors.fill: parent
-      fillMode: VideoOutput.PreserveAspectCrop
+      fillMode: VideoOutput.PreserveAspectFit
       volume: 0.3
       loops: MediaPlayer.Infinite
       autoPlay: true
