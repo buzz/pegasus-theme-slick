@@ -1,30 +1,60 @@
 import QtQuick 2.15
 import QtGraphicalEffects 1.12
-
 import "SearchFilter"
 import "Options"
+import "utils.js" as Utils
 
 FocusScope {
   id: main
 
-  property int restoredCollectionIndex
+  // Current collection/game index
+  property int currentCollectionIndex: -1
+  property int currentGameIndex: -1
 
-  Component.onCompleted: restoredCollectionIndex = restoreCollectionIndex()
+  onCurrentCollectionIndexChanged: {
+    const collection = collectionSearchFilter.get(currentCollectionIndex);
+    if (collection)
+      gamelistSearchFilter.sourceModel = collection.games;
+    mainSwitcher.jumpToCollection();
+
+    // Reset gamelist search text
+    searchTextGamelist = "";
+    options.resetSearchInputGamelist();
+  }
+
+  onCurrentGameIndexChanged: {
+    mainSwitcher.jumpToGame();
+  }
+
+  Component.onCompleted: {
+    const options = Utils.restoreOptions();
+    sortIndexCollections = options.sortIndexCollections;
+    sortIndexGamelist = options.sortIndexGamelist;
+    currentCollectionIndex = Utils.restoreCollectionIndex();
+  }
 
   Component.onDestruction: {
-    saveCollectionIndex();
-    saveGameIndex();
+    Utils.saveCollectionIndex();
+    Utils.saveGameIndex();
+  }
+
+  function launchGame() {
+    Utils.saveCollectionIndex();
+    Utils.saveGameIndex();
+    const game = gamelistSearchFilter.get(currentGameIndex);
+    if (game && game.modelData)
+      game.modelData.launch();
   }
 
   // Search/filter collection
 
   property string searchTextCollections: ""
-  property var sortIndexCollections: 0
+  property int sortIndexCollections: 0
   property string prevCollectionShortName: "" // remember collection to jump to after filter/sort
 
   property string searchTextGamelist: ""
-  property var sortIndexGamelist: 1
-  property string prevGameShortName: "" // remember game to jump to after filter/sort
+  property int sortIndexGamelist: 0
+  property string prevGamePath: "" // remember game to jump to after filter/sort
 
   CollectionSortFilterProxyModel {
     id: collectionSearchFilter
@@ -36,7 +66,7 @@ FocusScope {
 
     // Restore collection from before filter/sort
     onChanged: {
-      if (prevCollectionShortName) {
+      if (count && prevCollectionShortName) {
         mainSwitcher.goToCollection(prevCollectionShortName);
         prevCollectionShortName = "";
       }
@@ -46,16 +76,20 @@ FocusScope {
   GamelistSortFilterProxyModel {
     id: gamelistSearchFilter
 
-    sourceModel: collectionSearchFilter.get(mainSwitcher.currentCollectionsIndex).games
-
     searchText: main.searchTextGamelist
     sortIndex: main.sortIndexGamelist
 
+    onSourceModelChanged: {
+      if (count) {
+        currentGameIndex = Utils.restoreGameIndex();
+      }
+    }
+
     // Restore game from before filter/sort
     onChanged: {
-      if (prevGameShortName) {
-        mainSwitcher.goToGame(prevGameShortName);
-        prevGameShortName = "";
+      if (count && prevGamePath) {
+        mainSwitcher.goToGame(prevGamePath);
+        prevGamePath = "";
       }
     }
   }
@@ -67,33 +101,11 @@ FocusScope {
     }
   }
 
-  function restoreCollectionIndex() {
-    return api.memory.get('collectionIndex') || 0;
-  }
-
-  function saveCollectionIndex() {
-    api.memory.set('collectionIndex', mainSwitcher.currentCollectionsIndex);
-  }
-
-  function restoreGameIndex(collectionShortName) {
-    return api.memory.get(`${collectionShortName}GameIndex`) || 0;
-  }
-
-  function saveGameIndex() {
-    const collection = api.collections.get(mainSwitcher.currentCollectionsIndex);
-    const gameIdx = mainSwitcher.currentGameIndex;
-    if (collection && gameIdx !== null) {
-      api.memory.set(`${collection.shortName}GameIndex`, gameIdx);
-    }
-  }
-
-  function launchGame(collection, game) {
-    // TODO: save collection/state and restore after returning to pegasus
-    game.launch();
-  }
-
   MainSwitcher {
     id: mainSwitcher
+
+    optionsView: options.focus
+
     anchors.fill: parent
     focus: true
   }
@@ -129,10 +141,12 @@ FocusScope {
       mainSwitcher.focus = true;
       // Remember previous collection/game to jump to after updating model
       if (mainSwitcher.collectionsView) {
-        const prevCollection = collectionSearchFilter.get(mainSwitcher.currentCollectionsIndex);
+        const prevCollection = collectionSearchFilter.get(currentCollectionIndex);
         main.prevCollectionShortName = prevCollection ? prevCollection.shortName : "";
       } else {
-        // TODO
+        const prevGame = gamelistSearchFilter.get(currentGameIndex);
+        if (prevGame && prevGame.files.count)
+          main.prevGamePath = prevGame.files.get(0).path;
       }
     }
 

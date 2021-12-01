@@ -1,6 +1,37 @@
 import QtQuick 2.15
+import "../utils.js" as Utils
 
 ListView {
+  function jumpTo() {
+    positionViewAtIndex(currentCollectionIndex, ListView.SnapPosition);
+    currentIndex = currentCollectionIndex;
+  }
+
+  Keys.onPressed: {
+    if (api.keys.isAccept(event)) {
+      event.accepted = true;
+      Utils.saveCollectionIndex();
+      gamelistScreen.focus = true;
+    }
+  }
+  Keys.onRightPressed: {
+    if (!horizontalVelocity) {
+      event.accepted = true;
+      incrementCurrentIndex();
+    }
+  }
+  Keys.onLeftPressed: {
+    if (!horizontalVelocity) {
+      event.accepted = true;
+      decrementCurrentIndex();
+    }
+  }
+
+  onCurrentIndexChanged: currentCollectionIndex = currentIndex
+
+  currentIndex: -1
+  model: collectionSearchFilter
+
   orientation: ListView.Horizontal
   snapMode: PathView.SnapOneItem
   highlightRangeMode: ListView.StrictlyEnforceRange
@@ -13,12 +44,6 @@ ListView {
   highlightMoveDuration: -1
   highlightMoveVelocity: vpx(1280 * 4)
   maximumFlickVelocity: highlightMoveVelocity
-
-  Component.onCompleted: {
-    model = collectionSearchFilter;
-    positionViewAtIndex(restoredCollectionIndex, ListView.SnapPosition);
-    currentIndex = restoredCollectionIndex;
-  }
 
   delegate: CollectionScreen {
     width: main.width

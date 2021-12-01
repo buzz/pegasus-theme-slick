@@ -79,7 +79,6 @@ Main {
     ListElement { name: "Developer"; roleName: "developer" }
     ListElement { name: "Publisher"; roleName: "publisher" }
     ListElement { name: "Genre"; roleName: "genre" }
-    ListElement { name: "Play count"; roleName: "playCount" }
     ListElement { name: "Play time"; roleName: "playTime" }
     ListElement { name: "Last played"; roleName: "lastPlayed" }
   }

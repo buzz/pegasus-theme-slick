@@ -11,8 +11,7 @@ function formatLastPlayed(lastPlayed) {
   var now = new Date();
 
   var elapsedHours = (now.getTime() - lastPlayed.getTime()) / 1000 / 60 / 60;
-  if (elapsedHours < 24 && now.getDate() === lastPlayed.getDate())
-    return "today";
+  if (elapsedHours < 24 && now.getDate() === lastPlayed.getDate()) return "today";
 
   var elapsedDays = Math.round(elapsedHours / 24);
   if (elapsedDays <= 1) return "yesterday";

@@ -111,9 +111,9 @@ Item {
       }
 
       asynchronous: true
-      visible: modelData.assets.boxFront
+      visible: modelData && modelData.assets ? modelData.assets.boxFront : false
 
-      source: modelData.assets.boxFront || ""
+      source: modelData && modelData.assets ? modelData.assets.boxFront : ""
       sourceSize { width: 512; height: 512 }
       fillMode: Image.PreserveAspectFit
       smooth: true
@@ -137,7 +137,7 @@ Item {
         color: colorBoxBorder
       }
       color: colorBgBoxArt
-      visible: !modelData.assets.boxFront
+      visible: modelData && modelData.assets ? !modelData.assets.boxFront : true
 
       Item {
         anchors.fill: parent
@@ -160,7 +160,7 @@ Item {
             fill: parent
             margins: vpx(16)
           }
-          text: modelData.title || ""
+          text: modelData && modelData.title ? modelData.title : ""
           wrapMode: Text.WrapAnywhere
           horizontalAlignment: Text.AlignHCenter
           verticalAlignment: Text.AlignVCenter

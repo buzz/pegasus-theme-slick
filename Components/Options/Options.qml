@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.12
+import "../utils.js" as Utils
 
 FocusScope {
   id: options
@@ -12,6 +13,10 @@ FocusScope {
   signal close
 
   function closeAndApply() {
+    Utils.saveOptions({
+      sortIndexCollections: sortCollections.currentIndex,
+      sortIndexGamelist: sortGamelist.currentIndex,
+    });
     close();
     if (collectionsView)
       setFilterSortCollections(searchInputCollections.searchText, sortCollections.currentIndex);
@@ -19,12 +24,19 @@ FocusScope {
       setFilterSortGamelist(searchInputGamelist.searchText, sortGamelist.currentIndex);
   }
 
+  function resetSearchInputGamelist() {
+    searchInputGamelist.searchText = "";
+  }
+
   onFocusChanged: {
     if (focus) {
-      if (collectionsView)
+      if (collectionsView) {
+        sortCollections.jumpTo(sortIndexCollections);
         searchInputCollections.focus = true;
-      else
+      } else {
+        sortGamelist.jumpTo(sortIndexGamelist);
         searchInputGamelist.focus = true;
+      }
     }
   }
 
@@ -42,7 +54,6 @@ FocusScope {
     width: background.width + vpx(6)
     height: background.height + vpx(6)
     anchors.centerIn: parent
-    visible: true
 
     color: "#66000000"
     radius: radiusLarge
@@ -63,7 +74,7 @@ FocusScope {
     height: grid.height + vpx(40)
     anchors.centerIn: parent
 
-    color: "#aa000000"
+    color: "#c8000000"
     radius: radiusLarge
   }
 
@@ -129,7 +140,6 @@ FocusScope {
       Choice {
         id: sortCollections
 
-        enabled: options.focus
         visible: collectionsView
 
         Layout.preferredHeight: vpx(28)
@@ -150,7 +160,6 @@ FocusScope {
       Choice {
         id: sortGamelist
 
-        enabled: options.focus
         visible: !collectionsView
 
         Layout.preferredHeight: vpx(28)

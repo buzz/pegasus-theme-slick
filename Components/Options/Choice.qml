@@ -7,11 +7,16 @@ FocusScope {
   clip: true
 
   required property var model
-  readonly property int itemWidth: vpx(90)
+  readonly property int itemWidth: vpx(120)
 
   property alias currentIndex: listView.currentIndex
 
   signal accept
+
+  function jumpTo(idx) {
+    listView.positionViewAtIndex(idx, ListView.SnapPosition);
+    listView.currentIndex = idx;
+  }
 
   // Smoothly fade out grid at top and bottom
   LinearGradient {
@@ -61,8 +66,6 @@ FocusScope {
 
       width: itemWidth
       height: rect.height
-
-      property int choiceItemIndex: index
 
       Rectangle {
         id: rect

@@ -21,10 +21,17 @@ Item {
     width: collectionScreen.width / 1.67
     height: collectionScreen.height
     scale: collectionScreen.ListView.isCurrentItem ? 1.0 : 0.5
+    opacity: collectionScreen.ListView.isCurrentItem ? 1.0 : 0.0
 
     Behavior on scale {
       PropertyAnimation {
-        duration: 450
+        duration: durationLong
+        easing.type: Easing.OutCubic
+      }
+    }
+    Behavior on opacity {
+      PropertyAnimation {
+        duration: durationLong
         easing.type: Easing.OutCubic
       }
     }

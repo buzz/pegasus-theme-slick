@@ -2,40 +2,60 @@ import QtQuick 2.15
 import QtGraphicalEffects 1.12
 import "CollectionsCarousel"
 import "GamelistScreen"
+import "utils.js" as Utils
 
 FocusScope {
+  id: mainSwitcher
+
   property bool collectionsView: !gamelistScreen.focus
+  required property bool optionsView
 
-  property alias currentCollectionsIndex: collectionsCarousel.currentIndex
-  property alias currentGameIndex: gamelistScreen.currentGameIndex
-
-  function getCollectionIdxByShortName(collShortName) {
-    for (let i = 0; i < collectionSearchFilter.count; ++i) {
-      const c = collectionSearchFilter.get(i);
-      if (c.shortName === collShortName)
-        return i
-    }
-    return undefined;
+  function jumpToCollection() {
+    collectionsCarousel.jumpTo();
+    gamelistScreen.jumpToCollection();
+  }
+  function jumpToGame() {
+    gamelistScreen.jumpToGame();
   }
 
   // Restore collection from before search/filter
   function goToCollection(shortName) {
     if (shortName) {
-      const idx = getCollectionIdxByShortName(shortName) || 0;
+      let idx = 0;
+      for (let i = 0; i < collectionSearchFilter.count; ++i) {
+        const c = collectionSearchFilter.get(i);
+        if (c.shortName === shortName) {
+          idx = i;
+          break;
+        }
+      }
       collectionsCarousel.positionViewAtIndex(idx, ListView.SnapPosition);
       collectionsCarousel.currentIndex = idx;
     }
+  }
+
+  // Restore game from before search/filter
+  function goToGame(path) {
+    let idx = 0;
+    for (let i = 0; i < gamelistSearchFilter.count; ++i) {
+      const g = gamelistSearchFilter.get(i);
+      if (g.files.count && g.files.get(0).path === path) {
+        idx = i;
+        break;
+      }
+    }
+    currentGameIndex = idx;
   }
 
   Keys.onPressed: {
     if (!collectionsCarousel.horizontalVelocity) {
       if (api.keys.isNextPage(event)) {
         event.accepted = true;
-        saveGameIndex();
+        Utils.saveGameIndex();
         collectionsCarousel.incrementCurrentIndex();
       } else if (api.keys.isPrevPage(event)) {
         event.accepted = true;
-        saveGameIndex();
+        Utils.saveGameIndex();
         collectionsCarousel.decrementCurrentIndex();
       }
     }
@@ -72,28 +92,6 @@ FocusScope {
     width: main.width
     height: main.height
     anchors.bottom: parent.bottom
-
-    onCurrentIndexChanged: gamelistScreen.collection = collectionSearchFilter.get(currentIndex)
-
-    Keys.onPressed: {
-      if (api.keys.isAccept(event)) {
-        event.accepted = true;
-        saveCollectionIndex();
-        gamelistScreen.focus = true;
-      }
-    }
-    Keys.onRightPressed: {
-      if (!horizontalVelocity) {
-        event.accepted = true;
-        incrementCurrentIndex();
-      }
-    }
-    Keys.onLeftPressed: {
-      if (!horizontalVelocity) {
-        event.accepted = true;
-        decrementCurrentIndex();
-      }
-    }
   }
 
   GamelistScreen {
@@ -103,20 +101,13 @@ FocusScope {
     height: main.height
     anchors.top: collectionsCarousel.bottom
 
-    collection: collectionSearchFilter.get(collectionsCarousel.currentIndex)
-
     onBack: {
-      saveCollectionIndex();
-      saveGameIndex();
-      collectionsCarousel.focus = true
+      Utils.saveCollectionIndex();
+      Utils.saveGameIndex();
+      collectionsCarousel.focus = true;
     }
 
-    onItemSelected: {
-      saveCollectionIndex();
-      saveGameIndex();
-      const game = gamelistScreen.collection.games.get(gameIndex)
-      main.launchGame(gamelistScreen.collection, game);
-    }
+    onItemSelected: main.launchGame()
   }
 
   states: [

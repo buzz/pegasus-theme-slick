@@ -4,11 +4,21 @@ import QtGraphicalEffects 1.12
 
 Item {
   property var game
+  required property bool optionsView
 
   property bool gamelistView: gamelistScreen.focus
 
   property bool steam: false
   property bool hasImage: getImageSource().length
+
+  onOptionsViewChanged: {
+    if (videoPreviewLoader.item) {
+      if (optionsView)
+        videoPreviewLoader.item.pause();
+      else
+        videoPreviewLoader.item.play();
+    }
+  }
 
   onGameChanged: {
     videoPreviewLoader.sourceComponent = undefined;

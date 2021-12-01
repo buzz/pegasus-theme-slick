@@ -8,17 +8,18 @@ FocusScope {
 
   property var collection
 
-  property alias currentGameIndex: grid.currentGameIndex
-
-  signal itemSelected(int gameIndex)
+  signal itemSelected()
   signal back
 
-  onCollectionChanged:  Qt.callLater(resetSelected)
-  onFocusChanged: focus && Qt.callLater(resetSelected)
+  function jumpToCollection() {
+    collection = collectionSearchFilter.get(currentCollectionIndex)
+    gameGrid.jumpToCollection();
+  }
 
-  function resetSelected() {
-    if (gamelistScreen.collection)
-      grid.resetSelectedItem(restoreGameIndex(gamelistScreen.collection.shortName));
+  function jumpToGame() {
+    const game = gamelistSearchFilter.get(currentGameIndex);
+    gameDetails.game = game;
+    Qt.callLater(gameGrid.jumpToGame);
   }
 
   GameDetails {
@@ -33,7 +34,9 @@ FocusScope {
   }
 
   GameGrid {
-    id: grid
+    id: gameGrid
+
+    optionsView: mainSwitcher.optionsView
 
     width: parent.width / 2
     anchors {

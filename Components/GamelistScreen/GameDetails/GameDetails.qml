@@ -5,7 +5,7 @@ import "utils.js" as Utils
 Item {
   id: gameDetails
 
-  property var game: gamelistSearchFilter.get(currentGameIndex)
+  property var game
 
   ColumnLayout {
     anchors {
@@ -90,6 +90,7 @@ Item {
           anchors.fill: parent
 
           game: gameDetails.game
+          optionsView: mainSwitcher.optionsView
         }
       }
     }

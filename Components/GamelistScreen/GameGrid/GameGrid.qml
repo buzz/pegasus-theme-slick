@@ -4,25 +4,38 @@ import QtGraphicalEffects 1.12
 Item {
   id: gameGrid
 
-  property alias currentGameIndex: gridView.currentIndex
+  // Delay animation and scroll to item to make things work
+  property bool enableSelectedItem: false
 
-  property bool zoomSelectedItem: false
+  required property bool optionsView
 
-  function resetSelectedItem(idx) {
-    zoomSelectedItem = false;
+  onOptionsViewChanged: {
+    if (!optionsView)
+      resetSelectedItem();
+  }
+
+  function jumpToCollection() {
+    resetSelectedItem();
+  }
+
+  function jumpToGame() {
+    if (currentGameIndex !== gridView.currentIndex)
+      resetSelectedItem();
+  }
+
+  function resetSelectedItem() {
+    enableSelectedItem = false;
     resetSelectedTimer.restart();
-
-    if (idx !== null) {
-      gridView.positionViewAtIndex(idx, ListView.SnapPosition)
-      gridView.currentIndex = idx;
-    }
   }
 
   Timer {
     id: resetSelectedTimer
 
-    interval: 50
-    onTriggered: zoomSelectedItem = true
+    interval: durationVeryShort
+    onTriggered: {
+      gridView.currentIndex = currentGameIndex;
+      enableSelectedItem = true;
+    }
   }
 
   // Smoothly fade out grid at top and bottom
@@ -63,10 +76,10 @@ Item {
         leftMargin: vpx(40)
       }
 
+      model: gamelistSearchFilter
+
       keyNavigationEnabled: false
-
       cacheBuffer: 0
-
       snapMode: GridView.SnapToRow
 
       highlightRangeMode: GridView.StrictlyEnforceRange
@@ -79,16 +92,11 @@ Item {
       preferredHighlightBegin: (height - cellHeight) / 2
       preferredHighlightEnd: (height + cellHeight) / 2
 
-      model: gamelistSearchFilter
-
       property real columnCount: {
         if (cellHeightRatio > 1.2) return 5;
         if (cellHeightRatio > 0.6) return 4;
         return 3;
       }
-
-      onModelChanged: cellsNeedRecalc()
-      onCountChanged: cellsNeedRecalc()
 
       function cellsNeedRecalc() {
         firstImageLoaded = false;
@@ -100,6 +108,14 @@ Item {
 
         if (imageW > 0 && imageH > 0)
           cellHeightRatio = imageH / imageW;
+      }
+
+      onModelChanged: cellsNeedRecalc()
+      onCountChanged: cellsNeedRecalc()
+
+      onCurrentIndexChanged: {
+        if (enableSelectedItem)
+          currentGameIndex = currentIndex;
       }
 
       Keys.onUpPressed: {
@@ -126,14 +142,14 @@ Item {
         }
         else if (api.keys.isAccept(event)) {
           event.accepted = true;
-          gamelistScreen.itemSelected(currentIndex);
+          gamelistScreen.itemSelected();
         }
       }
 
       delegate: GameGridItem {
         width: GridView.view.cellWidth
         height: GridView.view.cellHeight
-        state: gameGrid.zoomSelectedItem && GridView.isCurrentItem ? "selected" : ""
+        state: !optionsView && gameGrid.enableSelectedItem && GridView.isCurrentItem ? "selected" : ""
         columnCount: GridView.view.columnCount
 
         imageHeightRatio: gridView.firstImageLoaded ? gridView.cellHeightRatio : 0.5
@@ -142,7 +158,7 @@ Item {
 
         onDoubleClicked: {
           selectItem();
-          // launchGame(collection, modelData);
+          gamelistScreen.itemSelected()
         }
 
         onImageLoaded: {
@@ -155,7 +171,7 @@ Item {
         }
 
         function selectItem() {
-          gridView.currentIndex = index
+          gridView.currentIndex = index;
         }
       }
     }
