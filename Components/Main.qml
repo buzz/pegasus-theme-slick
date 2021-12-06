@@ -13,17 +13,19 @@ FocusScope {
 
   onCurrentCollectionIndexChanged: {
     const collection = collectionSearchFilter.get(currentCollectionIndex);
-    if (collection)
+    if (collection && collection.games)
       gamelistSearchFilter.sourceModel = collection.games;
     mainSwitcher.jumpToCollection();
 
     // Reset gamelist search text
     searchTextGamelist = "";
     options.resetSearchInputGamelist();
+
+    Qt.callLater(mainSwitcher.jumpToGame);
   }
 
   onCurrentGameIndexChanged: {
-    mainSwitcher.jumpToGame();
+    Qt.callLater(mainSwitcher.jumpToGame);
   }
 
   Component.onCompleted: {
@@ -64,9 +66,10 @@ FocusScope {
     searchText: main.searchTextCollections
     sortIndex: main.sortIndexCollections
 
-    // Restore collection from before filter/sort
+    // Set collection after search/filter change
     onChanged: {
       if (count && prevCollectionShortName) {
+        // Restore collection from before
         mainSwitcher.goToCollection(prevCollectionShortName);
         prevCollectionShortName = "";
       }
@@ -85,12 +88,23 @@ FocusScope {
       }
     }
 
-    // Restore game from before filter/sort
+    // Set game after search/filter change
     onChanged: {
-      if (count && prevGamePath) {
+      // No games
+      if (count === 0) {
+        currentGameIndex = -1;
+        return;
+      }
+
+      // Restore game from before
+      if (prevGamePath) {
         mainSwitcher.goToGame(prevGamePath);
         prevGamePath = "";
+        return
       }
+
+      // Otherwise show first game
+      currentGameIndex = 0;
     }
   }
 
@@ -142,10 +156,10 @@ FocusScope {
       // Remember previous collection/game to jump to after updating model
       if (mainSwitcher.collectionsView) {
         const prevCollection = collectionSearchFilter.get(currentCollectionIndex);
-        main.prevCollectionShortName = prevCollection ? prevCollection.shortName : "";
+        main.prevCollectionShortName = prevCollection && prevCollection.shortName ? prevCollection.shortName : "";
       } else {
         const prevGame = gamelistSearchFilter.get(currentGameIndex);
-        if (prevGame && prevGame.files.count)
+        if (prevGame && prevGame.files && prevGame.files.count)
           main.prevGamePath = prevGame.files.get(0).path;
       }
     }

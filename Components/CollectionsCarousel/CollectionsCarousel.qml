@@ -3,15 +3,21 @@ import "../utils.js" as Utils
 
 ListView {
   function jumpTo() {
-    positionViewAtIndex(currentCollectionIndex, ListView.SnapPosition);
-    currentIndex = currentCollectionIndex;
+    if (currentCollectionIndex >= 0) {
+      positionViewAtIndex(currentCollectionIndex, ListView.SnapPosition);
+      currentIndex = currentCollectionIndex;
+    }
   }
 
   Keys.onPressed: {
     if (api.keys.isAccept(event)) {
       event.accepted = true;
-      Utils.saveCollectionIndex();
-      gamelistScreen.focus = true;
+
+      const collection = collectionSearchFilter.get(currentCollectionIndex);
+      if (collection && collection.games && collection.games.count) {
+        Utils.saveCollectionIndex();
+        gamelistScreen.focus = true;
+      }
     }
   }
   Keys.onRightPressed: {
@@ -48,5 +54,15 @@ ListView {
   delegate: CollectionScreen {
     width: main.width
     height: main.height
+  }
+
+  Text {
+    anchors.centerIn: parent
+
+    color: colorFontStrong
+    font.family: generalFont.name
+    font.pixelSize: fontSizeCollectionSubheader
+    text: "No collections found…"
+    visible: currentCollectionIndex === -1
   }
 }

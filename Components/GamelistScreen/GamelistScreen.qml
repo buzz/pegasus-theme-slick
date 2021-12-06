@@ -7,13 +7,16 @@ FocusScope {
   id: gamelistScreen
 
   property var collection
+  property bool gamesFound: currentGameIndex !== -1
 
   signal itemSelected()
   signal back
 
   function jumpToCollection() {
-    collection = collectionSearchFilter.get(currentCollectionIndex)
-    gameGrid.jumpToCollection();
+    if (currentCollectionIndex >= 0) {
+      collection = collectionSearchFilter.get(currentCollectionIndex)
+      gameGrid.jumpToCollection();
+    }
   }
 
   function jumpToGame() {
@@ -31,6 +34,7 @@ FocusScope {
       left: parent.left
       bottom: parent.bottom
     }
+    visible: gamesFound
   }
 
   GameGrid {
@@ -44,5 +48,16 @@ FocusScope {
       right: parent.right
       bottom: parent.bottom
     }
+    visible: gamesFound
+  }
+
+  Text {
+    anchors.centerIn: parent
+
+    color: colorFontStrong
+    font.family: generalFont.name
+    font.pixelSize: fontSizeCollectionSubheader
+    text: "No games found…"
+    visible: !gamesFound
   }
 }

@@ -15,11 +15,12 @@ Item {
   }
 
   function jumpToCollection() {
-    resetSelectedItem();
+    if (!collectionsView)
+      resetSelectedItem();
   }
 
   function jumpToGame() {
-    if (currentGameIndex !== gridView.currentIndex)
+    if (currentGameIndex >= 0 && currentGameIndex !== gridView.currentIndex)
       resetSelectedItem();
   }
 
