@@ -50,3 +50,15 @@ function saveGameIndex() {
   )
     api.memory.set(`${collection.shortName}GameIndex`, currentGameIndex);
 }
+
+function isGameLaunch() {
+  if (api.memory.has("gameLaunch")) {
+    api.memory.unset("gameLaunch");
+    return true;
+  }
+  return false;
+}
+
+function saveGameLaunch() {
+  api.memory.set("gameLaunch", true);
+}

@@ -47,6 +47,14 @@ FocusScope {
     currentGameIndex = idx;
   }
 
+  function showCollections() {
+    collectionsCarousel.focus = true;
+  }
+
+  function showGamelist() {
+    gamelistScreen.focus = true;
+  }
+
   Keys.onPressed: {
     if (!collectionsCarousel.horizontalVelocity) {
       if (api.keys.isNextPage(event)) {
@@ -97,7 +105,7 @@ FocusScope {
       const collection = collectionSearchFilter.get(currentCollectionIndex);
       if (collection && collection.games && collection.games.count) {
         Utils.saveCollectionIndex();
-        gamelistScreen.focus = true;
+        mainSwitcher.showGamelist();
       }
     }
   }
@@ -112,7 +120,7 @@ FocusScope {
     onBack: {
       Utils.saveCollectionIndex();
       Utils.saveGameIndex();
-      collectionsCarousel.focus = true;
+      mainSwitcher.showCollections();
     }
 
     onItemSelected: main.launchGame()

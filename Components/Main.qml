@@ -33,6 +33,10 @@ FocusScope {
     sortIndexCollections = options.sortIndexCollections;
     sortIndexGamelist = options.sortIndexGamelist;
     currentCollectionIndex = Utils.restoreCollectionIndex();
+
+    // Go to gamelist if we're coming back from a game
+    if (Utils.isGameLaunch())
+      mainSwitcher.showGamelist();
   }
 
   Component.onDestruction: {
@@ -43,6 +47,8 @@ FocusScope {
   function launchGame() {
     Utils.saveCollectionIndex();
     Utils.saveGameIndex();
+    Utils.saveGameLaunch();
+
     const game = gamelistSearchFilter.get(currentGameIndex);
     if (game && game.modelData)
       game.modelData.launch();
