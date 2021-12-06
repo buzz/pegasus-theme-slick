@@ -20,26 +20,28 @@ function saveOptions(opts) {
   api.memory.set("sortIndexGamelist", opts.sortIndexGamelist);
 }
 
-function restoreCollectionIndex() {
-  const idx = api.memory.get("collectionIndex");
-  if (typeof idx === "number" && idx >= 0) return idx;
-  return 0;
+function restoreCollection() {
+  const shortName = api.memory.get("collectionShortName");
+  if (typeof shortName === "string" && shortName.length) return shortName;
+  return "";
 }
 
-function saveCollectionIndex() {
-  api.memory.set("collectionIndex", currentCollectionIndex);
+function saveCollection() {
+  const collection = collectionSearchFilter.get(currentCollectionIndex);
+  if (collection && collection.shortName)
+    api.memory.set("collectionShortName", collection.shortName);
 }
 
-function restoreGameIndex() {
+function restoreGame() {
   const collection = collectionSearchFilter.get(currentCollectionIndex);
   if (collection && collection.shortName) {
-    const idx = api.memory.get(`${collection.shortName}GameIndex`);
-    if (typeof idx === "number" && idx >= 0) return idx;
+    const gamePath = api.memory.get(`${collection.shortName}GamePath`);
+    if (typeof gamePath === "string" && gamePath.length > 0) return gamePath;
   }
-  return 0;
+  return "";
 }
 
-function saveGameIndex() {
+function saveGame() {
   const collection = collectionSearchFilter.get(currentCollectionIndex);
   if (
     collection &&
@@ -47,8 +49,11 @@ function saveGameIndex() {
     collection.shortName.length > 0 &&
     typeof currentGameIndex === "number" &&
     currentGameIndex >= 0
-  )
-    api.memory.set(`${collection.shortName}GameIndex`, currentGameIndex);
+  ) {
+    const game = gamelistSearchFilter.get(currentGameIndex);
+    if (game && game.files && game.files.count)
+      api.memory.set(`${collection.shortName}GamePath`, game.files.get(0).path);
+  }
 }
 
 function isGameLaunch() {

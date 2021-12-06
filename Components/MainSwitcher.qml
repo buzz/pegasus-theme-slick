@@ -14,12 +14,11 @@ FocusScope {
     collectionsCarousel.jumpTo();
     gamelistScreen.jumpToCollection();
   }
-  function jumpToGame() {
-    gamelistScreen.jumpToGame();
-  }
 
-  // Restore collection from before search/filter
-  function goToCollection(shortName) {
+  function jumpToGame() { gamelistScreen.jumpToGame() }
+
+  // Go to colleciton using short name
+  function goToCollectionByShortName(shortName) {
     if (shortName) {
       let idx = 0;
       for (let i = 0; i < collectionSearchFilter.count; ++i) {
@@ -34,8 +33,8 @@ FocusScope {
     }
   }
 
-  // Restore game from before search/filter
-  function goToGame(path) {
+  // Go to game using ROM path
+  function goToGameByPath(path) {
     let idx = 0;
     for (let i = 0; i < gamelistSearchFilter.count; ++i) {
       const g = gamelistSearchFilter.get(i);
@@ -59,11 +58,11 @@ FocusScope {
     if (!collectionsCarousel.horizontalVelocity) {
       if (api.keys.isNextPage(event)) {
         event.accepted = true;
-        Utils.saveGameIndex();
+        Utils.saveGame();
         collectionsCarousel.incrementCurrentIndex();
       } else if (api.keys.isPrevPage(event)) {
         event.accepted = true;
-        Utils.saveGameIndex();
+        Utils.saveGame();
         collectionsCarousel.decrementCurrentIndex();
       }
     }
@@ -104,7 +103,7 @@ FocusScope {
     onSelect: {
       const collection = collectionSearchFilter.get(currentCollectionIndex);
       if (collection && collection.games && collection.games.count) {
-        Utils.saveCollectionIndex();
+        Utils.saveCollection();
         mainSwitcher.showGamelist();
       }
     }
@@ -118,8 +117,8 @@ FocusScope {
     anchors.top: collectionsCarousel.bottom
 
     onBack: {
-      Utils.saveCollectionIndex();
-      Utils.saveGameIndex();
+      Utils.saveCollection();
+      Utils.saveGame();
       mainSwitcher.showCollections();
     }
 

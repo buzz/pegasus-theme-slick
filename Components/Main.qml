@@ -11,6 +11,29 @@ FocusScope {
   property int currentCollectionIndex: -1
   property int currentGameIndex: -1
 
+  // Sorting/filtering
+  property string searchTextCollections: ""
+  property int sortIndexCollections: 0
+  property string prevCollectionShortName: "" // collection to jump to jump
+
+  property string searchTextGamelist: ""
+  property int sortIndexGamelist: 0
+  property string prevGamePath: "" // remember game to jump to jump
+
+  Component.onCompleted: {
+    prevCollectionShortName = Utils.restoreCollection();
+
+    const options = Utils.restoreOptions();
+    sortIndexCollections = options.sortIndexCollections;
+    sortIndexGamelist = options.sortIndexGamelist;
+
+    Qt.callLater(collectionSearchFilter.restoreCollection);
+
+    // Go to gamelist if we're coming back from a game
+    if (Utils.isGameLaunch())
+      mainSwitcher.showGamelist();
+  }
+
   onCurrentCollectionIndexChanged: {
     const collection = collectionSearchFilter.get(currentCollectionIndex);
     if (collection && collection.games)
@@ -28,25 +51,14 @@ FocusScope {
     Qt.callLater(mainSwitcher.jumpToGame);
   }
 
-  Component.onCompleted: {
-    const options = Utils.restoreOptions();
-    sortIndexCollections = options.sortIndexCollections;
-    sortIndexGamelist = options.sortIndexGamelist;
-    currentCollectionIndex = Utils.restoreCollectionIndex();
-
-    // Go to gamelist if we're coming back from a game
-    if (Utils.isGameLaunch())
-      mainSwitcher.showGamelist();
-  }
-
   Component.onDestruction: {
-    Utils.saveCollectionIndex();
-    Utils.saveGameIndex();
+    Utils.saveCollection();
+    Utils.saveGame();
   }
 
   function launchGame() {
-    Utils.saveCollectionIndex();
-    Utils.saveGameIndex();
+    Utils.saveCollection();
+    Utils.saveGame();
     Utils.saveGameLaunch();
 
     const game = gamelistSearchFilter.get(currentGameIndex);
@@ -56,14 +68,6 @@ FocusScope {
 
   // Search/filter collection
 
-  property string searchTextCollections: ""
-  property int sortIndexCollections: 0
-  property string prevCollectionShortName: "" // remember collection to jump to after filter/sort
-
-  property string searchTextGamelist: ""
-  property int sortIndexGamelist: 0
-  property string prevGamePath: "" // remember game to jump to after filter/sort
-
   CollectionSortFilterProxyModel {
     id: collectionSearchFilter
 
@@ -72,14 +76,20 @@ FocusScope {
     searchText: main.searchTextCollections
     sortIndex: main.sortIndexCollections
 
-    // Set collection after search/filter change
-    onChanged: {
-      if (count && prevCollectionShortName) {
-        // Restore collection from before
-        mainSwitcher.goToCollection(prevCollectionShortName);
-        prevCollectionShortName = "";
+    function restoreCollection() {
+      if (count) {
+        if (prevCollectionShortName) {
+          // Restore collection from before
+          mainSwitcher.goToCollectionByShortName(prevCollectionShortName);
+          prevCollectionShortName = "";
+        } else {
+          currentCollectionIndex = 0;
+        }
       }
     }
+
+    // Restore collection after search/filter change
+    onChanged: Qt.callLater(collectionSearchFilter.restoreCollection);
   }
 
   GamelistSortFilterProxyModel {
@@ -88,14 +98,7 @@ FocusScope {
     searchText: main.searchTextGamelist
     sortIndex: main.sortIndexGamelist
 
-    onSourceModelChanged: {
-      if (count) {
-        currentGameIndex = Utils.restoreGameIndex();
-      }
-    }
-
-    // Set game after search/filter change
-    onChanged: {
+    function restoreGame() {
       // No games
       if (count === 0) {
         currentGameIndex = -1;
@@ -104,7 +107,7 @@ FocusScope {
 
       // Restore game from before
       if (prevGamePath) {
-        mainSwitcher.goToGame(prevGamePath);
+        mainSwitcher.goToGameByPath(prevGamePath);
         prevGamePath = "";
         return
       }
@@ -112,6 +115,16 @@ FocusScope {
       // Otherwise show first game
       currentGameIndex = 0;
     }
+
+    onSourceModelChanged: {
+      if (count) {
+        prevGamePath = Utils.restoreGame();
+        Qt.callLater(gamelistSearchFilter.restoreGame);
+      }
+    }
+
+    // Restore game after search/filter change
+    onChanged: Qt.callLater(gamelistSearchFilter.restoreGame)
   }
 
   Keys.onPressed: {
