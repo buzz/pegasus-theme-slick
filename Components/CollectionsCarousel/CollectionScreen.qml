@@ -82,4 +82,9 @@ Item {
       }
     }
   }
+
+  MouseArea {
+    anchors.fill: parent
+    onDoubleClicked: collectionsCarousel.select()
+  }
 }

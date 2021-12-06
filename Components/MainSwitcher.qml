@@ -92,6 +92,14 @@ FocusScope {
     width: main.width
     height: main.height
     anchors.bottom: parent.bottom
+
+    onSelect: {
+      const collection = collectionSearchFilter.get(currentCollectionIndex);
+      if (collection && collection.games && collection.games.count) {
+        Utils.saveCollectionIndex();
+        gamelistScreen.focus = true;
+      }
+    }
   }
 
   GamelistScreen {

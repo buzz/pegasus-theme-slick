@@ -2,6 +2,10 @@ import QtQuick 2.15
 import "../utils.js" as Utils
 
 ListView {
+  id: collectionsCarousel
+
+  signal select
+
   function jumpTo() {
     if (currentCollectionIndex >= 0) {
       positionViewAtIndex(currentCollectionIndex, ListView.SnapPosition);
@@ -12,12 +16,7 @@ ListView {
   Keys.onPressed: {
     if (api.keys.isAccept(event)) {
       event.accepted = true;
-
-      const collection = collectionSearchFilter.get(currentCollectionIndex);
-      if (collection && collection.games && collection.games.count) {
-        Utils.saveCollectionIndex();
-        gamelistScreen.focus = true;
-      }
+      select();
     }
   }
   Keys.onRightPressed: {
