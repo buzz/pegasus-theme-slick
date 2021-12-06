@@ -15,6 +15,7 @@ Item {
   }
 
   function jumpToCollection() {
+    gridView.cellsNeedRecalc();
     if (!collectionsView)
       resetSelectedItem();
   }
@@ -73,8 +74,8 @@ Item {
 
       anchors {
         fill: parent
-        rightMargin: vpx(40)
-        leftMargin: vpx(40)
+        rightMargin: marginHorizGamelistScreen
+        leftMargin: marginHorizGamelistScreen
       }
 
       model: gamelistSearchFilter
@@ -112,7 +113,6 @@ Item {
       }
 
       onModelChanged: cellsNeedRecalc()
-      onCountChanged: cellsNeedRecalc()
 
       onCurrentIndexChanged: {
         if (enableSelectedItem)
