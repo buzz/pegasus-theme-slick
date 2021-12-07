@@ -40,7 +40,7 @@ Item {
       timerVideoDelay.stop();
     }
 
-    if (collection.shortName == "steam") {
+    if (collection && collection.shortName == "steam") {
       steam = true
     } else {
       steam = false

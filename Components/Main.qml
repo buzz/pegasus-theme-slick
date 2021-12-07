@@ -7,6 +7,9 @@ import "utils.js" as Utils
 FocusScope {
   id: main
 
+  // Prevent filter reset collection on initial load
+  property bool initialLoad: true
+
   // Current collection/game index
   property int currentCollectionIndex: -1
   property int currentGameIndex: -1
@@ -77,6 +80,8 @@ FocusScope {
     sortIndex: main.sortIndexCollections
 
     function restoreCollection() {
+      main.initialLoad = false;
+
       if (count) {
         if (prevCollectionShortName) {
           // Restore collection from before
@@ -89,7 +94,10 @@ FocusScope {
     }
 
     // Restore collection after search/filter change
-    onChanged: Qt.callLater(collectionSearchFilter.restoreCollection);
+    onChanged: {
+      if (!initialLoad)
+        Qt.callLater(collectionSearchFilter.restoreCollection);
+    }
   }
 
   GamelistSortFilterProxyModel {
