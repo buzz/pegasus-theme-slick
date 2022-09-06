@@ -1,0 +1,26 @@
+- constants
+ - font sizes
+
+- collections
+ - mouse navigation?
+ - add "virtual" collections
+  - all games
+  - favorite
+  - genres
+  - companies
+ - little "breadcrumb" on the bottom?
+ - split up info into cpu, memory, graphics... for better formatting
+
+- gamelist
+ - views
+  - fullscreen grid with toggleable details
+  - text list instead of grid
+ - a-z slider on the right side?
+ - customize navigation
+  - don't wrap at end of line
+  - pageup/down: scroll one page?
+ - fav item (keys details?)
+   - Has fav support: https://github.com/plaidman/retromega-next
+
+- settings?
+ - mute preview video
