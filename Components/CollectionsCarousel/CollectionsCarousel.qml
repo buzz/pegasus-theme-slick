@@ -1,4 +1,4 @@
-import QtQuick 2.15
+import QtQuick 2.12
 import "../utils.js" as Utils
 
 ListView {
@@ -44,7 +44,6 @@ ListView {
   highlightFollowsCurrentItem: true
   spacing: vpx(100)
   cacheBuffer: 0 // Keep 1 delegate outside of screen in each direction
-  reuseItems: true
 
   highlightMoveDuration: -1
   highlightMoveVelocity: vpx(1280 * 4)
